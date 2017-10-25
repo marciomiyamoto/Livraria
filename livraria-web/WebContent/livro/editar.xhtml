@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head></h:head>
+<h:body>
+	<h:form id="editarLivro">
+		<p:growl id="growl" showDetail="true" life="8000" />
+		<h1>Edição de livro</h1>
+		<p:panelGrid styleClass="ui-noborder" id="pgLivro">
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Título:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputText value="#{editarLivroMB.livro.titulo}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Autor:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputText value="#{editarLivroMB.livro.autor.nome}" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Ano:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputText value="#{editarLivroMB.livro.ano}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Edição:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputText value="#{editarLivroMB.livro.edicao}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Num de páginas:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputText value="#{editarLivroMB.livro.numPaginas}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Código de barras:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputText value="#{editarLivroMB.livro.codBarras}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				 <p:column colspan="5">
+				 	<fieldset style="width:500px;">
+						<legend>Categorias</legend>
+						 	<p:pickList value="#{editarLivroMB.catPickList}" var="cat" itemLabel="#{cat.nome}" itemValue="#{cat}" converter="primeFacesPickListConverter">
+						 		<f:facet name="sourceCaption">Disponíveis</f:facet>
+		        				<f:facet name="targetCaption">Selecionadas</f:facet>
+						 	</p:pickList>
+				 	</fieldset>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="5">
+					<fieldset style="width:500px;">
+						<legend>Subcategorias</legend>
+						 	<p:pickList value="#{editarLivroMB.subCatPickList}" var="subcat" itemLabel="#{subcat.nome}" itemValue="#{subcat}" converter="primeFacesPickListConverter">
+						 		<f:facet name="sourceCaption">Disponíveis</f:facet>
+		        				<f:facet name="targetCaption">Selecionadas</f:facet>
+						 	</p:pickList>
+				 	</fieldset>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Editora:"/>
+				</p:column>
+				<p:column colspan="4" >
+					<p:selectOneMenu style="width:100%" value="#{editarLivroMB.livro.editora.id}">
+						<f:selectItems value="#{editarLivroMB.editoras}" var="ed" itemLabel="#{ed.nome}" itemValue="#{ed.id}" />
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="4">
+					<p:outputLabel value="Grupo de precificação:"/>
+				</p:column>
+				<p:column colspan="3" >
+					<p:selectOneMenu style="width:100%" value="#{editarLivroMB.livro.grupoPrec.id}">
+						<f:selectItems value="#{editarLivroMB.gruposDePrecificacao}" var="gru" itemLabel="#{gru.nome}" itemValue="#{gru.id}"/>
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="5">
+					<fieldset>
+						<legend>Dimensões:</legend>
+						<p:panelGrid>
+							<p:row>
+								<p:column colspan="1">
+									<p:outputLabel value="Altura:"/>
+								</p:column>
+								<p:column colspan="1">
+									<p:inputText value="#{editarLivroMB.livro.dimensoes.altura}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column colspan="1">
+									<p:outputLabel value="Largura:"/>
+								</p:column>
+								<p:column colspan="1">
+									<p:inputText value="#{editarLivroMB.livro.dimensoes.largura}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column colspan="1">
+									<p:outputLabel value="Peso:"/>
+								</p:column>
+								<p:column colspan="1">
+									<p:inputText value="#{editarLivroMB.livro.dimensoes.peso}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column colspan="1">
+									<p:outputLabel value="Profundidade:"/>
+								</p:column>
+								<p:column colspan="1">
+									<p:inputText value="#{editarLivroMB.livro.dimensoes.profundidade}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</fieldset>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="1">
+					<p:outputLabel value="Sinopse:"/>
+				</p:column>
+				<p:column colspan="4">
+					<p:inputTextarea rows="5" style="width:100%" value="#{editarLivroMB.livro.sinopse}"/>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+		<br/>
+		<p:commandButton value="Atualizar" actionListener="#{editarLivroMB.alterarLivro}" update="growl"/>
+		<p:button value="Voltar" outcome="busca.xhtml"/>
+	</h:form>
+</h:body>
+</html>

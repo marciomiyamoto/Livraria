@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head></h:head>
+<h:body>
+	<h:form id="cadastrarCliente">
+		<p:growl id="growl" showDetail="true" life="8000" />
+		<p:link value="Buscar" outcome="buscar.xhtml" style="float:right;margin-right:10px;" />
+		<p:wizard id="wizCliente" backLabel="Voltar" nextLabel="Próximo" >
+			<p:tab id="cliente1" title="Dados de login">
+				<h:panelGrid>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Email"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.cliente.email}" required="true"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Senha"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<h:inputSecret value="#{clienteMB.cliente.senha}" 
+							validatorMessage="Senha inválida! A senha cadastrada pelo usuário deve ser composta de pelo menos 8 caracteres, ter letras maiúsculas e minúsculas além de conter caracteres especiais.">
+								<f:validateRegex pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^+=])(?=\\S+$).{8,}" />
+							</h:inputSecret>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Repetir senha"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:password value="#{clienteMB.senhaRepetida}"/>
+						</p:column>
+					</p:row>
+				</h:panelGrid>
+			</p:tab>
+			<p:tab id="cliente2" title="Dados pessoais">
+				<h:panelGrid>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Nome completo"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.cliente.nome}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Gênero"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:selectOneMenu value="#{clienteMB.generoSelecionado.id}">
+								<f:selectItems value="#{clienteMB.generos}" var="ger" itemLabel="#{ger.nome}" itemValue="#{ger.id}"/>
+							</p:selectOneMenu>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Data de nascimento"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputMask value="#{clienteMB.maskDtNascimento}" mask="99/99/9999"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="CPF"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.cliente.cpf}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Telefone fixo"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.telFixo.ddd}" maxlength="2" style="width:20px; margin-right:10px;"/>
+						</p:column>
+						<p:column>
+							<p:inputText value="#{clienteMB.telFixo.numero}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Telefone celular"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.telCelular.ddd}" maxlength="2" style="width:20px;margin-right:10px;"/>
+						</p:column>
+						<p:column>
+							<p:inputText value="#{clienteMB.telCelular.numero}"/>
+						</p:column>
+					</p:row>
+				</h:panelGrid>
+			</p:tab>
+			<p:tab id="end" title="Endereço">
+				<h:panelGrid>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Título"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.endereco.titulo}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Tipo de residência"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.endereco.tipoResidencia}" placeholder="Casa, apartamento, etc"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Tipo de logradouro"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.endereco.tipoLogradouro}" placeholder="Rua, Avenida, Praça, etc"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Logradouro"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.endereco.logradouro}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Número"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.endereco.numero}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Bairro"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputText value="#{clienteMB.endereco.bairro}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="CEP"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:inputMask value="#{clienteMB.endereco.cep}" mask="99999-999"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="País"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:selectOneMenu value="#{clienteMB.paisSelecionado.id}" required="true" >
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{clienteMB.paises}" var="pais" itemLabel="#{pais.nome}" itemValue="#{pais.id}"/>
+								<p:ajax listener="#{clienteMB.popularEstados}" update="cadastrarCliente:dropDownEstados dropDownCidades"/>
+						</p:selectOneMenu>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Estado"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:selectOneMenu id="dropDownEstados" value="#{clienteMB.estadoSelecionado.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{clienteMB.estados}" var="est" itemLabel="#{est.nome}" itemValue="#{est.id}"/>
+								<p:ajax listener="#{clienteMB.popularCidades}" update="cadastrarCliente:dropDownCidades"/>
+						</p:selectOneMenu>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Cidade"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:selectOneMenu id="dropDownCidades" value="#{clienteMB.cidadeSelecionada.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{clienteMB.cidades}" var="cid" itemLabel="#{cid.nome}" itemValue="#{cid.id}"/>
+						</p:selectOneMenu>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel value="Observações"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:inputTextarea value="#{clienteMB.endereco.observacoes}" rows="2"/>
+					</p:row>
+					<p:row>
+						<p:selectBooleanCheckbox value="#{clienteMB.flgEndCobranca}" style="margin-right:10px;"/>
+						<h:outputText value="O endereço de cobrança é o mesmo"/>
+					</p:row>
+					<p:row>
+						<p:selectBooleanCheckbox value="#{clienteMB.flgEndEntrega}" style="margin-right:10px;" >
+							<p:ajax update="cadastrarCliente:pref" />
+						</p:selectBooleanCheckbox>
+						<h:outputText value="O endereço de entrega é o mesmo"/>
+					</p:row>
+					<p:row>
+						<p:selectBooleanCheckbox id="pref" value="#{clienteMB.flgEndPreferencial}" disabled="#{clienteMB.flgEndEntrega == false || clienteMB.flgEndEntrega == null}" style="margin-right:10px;"/>
+						<h:outputText value="Endereço preferencial"/>
+					</p:row>
+				</h:panelGrid>
+				<p:commandButton value="Cadastrar" actionListener="#{clienteMB.cadastrarCliente}" update="growl" style="margin-top:10px;" />
+			</p:tab>
+			
+		</p:wizard>
+	</h:form>
+</h:body>
+</html>

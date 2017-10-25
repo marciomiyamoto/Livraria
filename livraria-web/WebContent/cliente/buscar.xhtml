@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head></h:head>
+<h:body>
+	<h:form id="buscaCliente">
+				<p:growl id="growl" showDetail="true" life="8000" />
+		<p:commandLink value="Log de transações" style="float:right;"/>
+		<p:link value="Cadastrar cliente" outcome="cadastrar.xhtml" style="float:right;margin-right:10px;" />
+		<br/>
+		<br/>
+		<p:panel header="Filtro de busca">
+			<p:panelGrid styleClass="ui-noborder">
+				<p:row>
+					<p:column colspan="1">
+						<h:outputLabel value="Id:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{clienteMB.cliente.id}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<h:outputLabel value="Nome:"/>
+					</p:column>
+					<p:column colspan="3">
+						<p:inputText value="#{clienteMB.cliente.nome}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<h:outputText value="Gênero:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu value="#{clienteMB.generoSelecionado.id}">
+							<f:selectItem itemValue=""/>
+							<f:selectItems value="#{clienteMB.generos}" var="ger" itemLabel="#{ger.nome}" itemValue="#{ger.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="1">
+						<h:outputText value="Data Nasc.:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputMask value="#{clienteMB.maskDtNascimento}" mask="99/99/9999"/>
+					</p:column>
+					<p:column colspan="1">
+						<h:outputText value="CPF:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{clienteMB.cliente.cpf}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<h:outputText value="Telefone fixo:" />
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{clienteMB.telFixo.ddd}" maxlength="2" style="width:20px; margin-right:10px;"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{clienteMB.telFixo.numero}"/>
+					</p:column>
+					<p:column colspan="1">
+						<h:outputText value="Telefone celular:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{clienteMB.telCelular.ddd}" maxlength="2" style="width:20px;margin-right:10px;"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{clienteMB.telCelular.numero}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<h:outputText value="Email:"/>
+					</p:column>
+					<p:column colspan="3">
+						<p:inputText value="#{clienteMB.cliente.email}" style="width:100%"/>
+					</p:column>
+					<p:column cospan="1">
+						<h:outputText value="Status:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu value="#{clienteMB.cliente.ativo}" style="width:90%">
+							<f:selectItem itemLabel=""/>
+							<f:selectItem itemLabel="Ativo" itemValue="true" />
+							<f:selectItem itemLabel="Inativo" itemValue="false" />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+		
+		<p:commandButton value="Buscar" actionListener="#{clienteMB.buscarClientes}" style="margin-top:10px;margin:auto;" update="buscaCliente:tdClientes"/>
+		
+		<p:dataTable id="tdClientes" var="cli" value="#{clienteMB.clientes}" >
+			<f:facet name="header">
+				Resultado da busca
+			</f:facet>
+			<p:column headerText="ID">
+				<h:outputText value="#{cli.id}"/>
+			</p:column>
+			<p:column headerText="Nome">
+				<h:outputText value="#{cli.nome}"/>
+			</p:column>
+			<p:column headerText="Email">
+				<h:outputText value="#{cli.email}"/>
+			</p:column>
+			<p:column style="width:32px;text-align: center">
+             	<p:commandButton action="#{clienteMB.visualizarCliente}" ajax="false" icon="ui-icon-search" title="View">
+             		<f:setPropertyActionListener value="#{cli}" target="#{clienteMB.clienteSelecionado}" />
+             	</p:commandButton>
+        </p:column>
+		</p:dataTable>
+	</h:form>
+</h:body>
+</html>

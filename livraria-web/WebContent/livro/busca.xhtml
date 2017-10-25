@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head></h:head>
+<h:body>
+	<h:form id="busca">
+		<p:growl id="growl" showDetail="true" life="8000" />
+		<p:commandLink value="Log de transações" style="float:right;" action="log.xhtml"/>
+		<p:link value="Cadastrar livro" style="float:right;margin-right:10px;" outcome="cadastrar.xtml" />
+		<br/>
+		<br/>
+		<p:panel header="Filtro de busca">
+			<p:panelGrid styleClass="ui-noborder">
+				<p:row>
+					<p:column colspan="1">
+						<p:outputLabel value="Título:"/>
+					</p:column>
+					<p:column colspan="3">
+						<p:inputText value="#{livroMB.livro.titulo}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Autor:"/>
+					</p:column>
+					<p:column colspan="3">
+						<p:inputText value="#{livroMB.autor.nome}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<p:outputLabel value="Ano:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.livro.ano}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Edição:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.livro.edicao}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Páginas:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.livro.numPaginas}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Cód. barras:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.livro.codBarras}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<p:outputLabel value="Categoria:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu style="width:90%" value="#{livroMB.categoria.id}">
+							<f:selectItem itemLabel=""/>
+							<f:selectItems value="#{livroMB.categorias}" var="cat" itemLabel="#{cat.nome}" itemValue="#{cat.id}" />
+						</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Subcategoria:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu style="width:90%" value="#{livroMB.subcategoria.id}">
+							<f:selectItem itemLabel=""/>
+							<f:selectItems value="#{livroMB.subcategorias}" var="sub" itemLabel="#{sub.nome}" itemValue="#{sub.id}" />
+						</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Editora:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu style="width:90%" value="#{livroMB.editora.id}">
+							<f:selectItem itemLabel=""/>
+							<f:selectItems value="#{livroMB.editoras}" var="ed" itemLabel="#{ed.nome}" itemValue="#{ed.id}" />
+					</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Grupo de precificação:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu style="width:90%" value="#{livroMB.grupoDePrecificacao.id}">
+							<f:selectItem itemLabel=""/>
+							<f:selectItems value="#{livroMB.gruposDePrecificacao}" var="grp" itemLabel="#{grp.nome}" itemValue="#{grp.id}" />
+					</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<p:outputLabel value="Altura:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.dimensoes.altura}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Largura:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.dimensoes.largura}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Peso:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.dimensoes.peso}" style="width:100%"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Profundidade:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:inputText value="#{livroMB.dimensoes.profundidade}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<p:outputLabel value="Sinopse:"/>
+					</p:column>
+					<p:column colspan="7">
+						<p:inputTextarea value="#{livroMB.livro.sinopse}" style="width:100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="1">
+						<p:outputLabel value="Status:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu value="#{livroMB.filtroStatus}" style="width:90%">
+							<f:selectItem itemLabel=""/>
+							<f:selectItem itemLabel="Ativo" itemValue="true" />
+							<f:selectItem itemLabel="Inativo" itemValue="false" />
+								<p:ajax listener="#{livroMB.carregaCatFiltro}" update="busca:dropDownFiltroCat"/>
+						</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Cat. ativação / desativação:"/>
+					</p:column>
+					<p:column colspan="1">
+						<p:selectOneMenu id="dropDownFiltroCat" value="#{livroMB.filtroCatAtIn.id}" style="width:90%">
+							<f:selectItem itemLabel="" />
+							<f:selectItems value="#{livroMB.catAtivInativas}" var="cat" itemLabel="#{cat.nome}" itemValue="#{cat.id}" />
+						</p:selectOneMenu>
+					</p:column>
+					<p:column colspan="1">
+						<p:outputLabel value="Justificativa:"/>
+					</p:column>
+					<p:column colspan="3">
+						<p:inputText value="#{livroMB.livro.justificativa}" style="width:100%"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panel>
+		
+		<p:commandButton value="Buscar" actionListener="#{livroMB.buscarLivros}" style="margin-top:10px;margin:auto;"/>
+		
+		<p:dataGrid id="dgLivros" var="livro" value="#{livroMB.livros}" columns="8" layout="grid" style="margin-top:10px;text-align: start;"
+					rows="16" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="16, 32, 64">
+					<f:facet name="header">Resultado da busca</f:facet>
+					<p:panel>
+						<h:panelGrid columns="1" style="width:50px;" >
+							<p:commandButton value=""
+								action="#{livroMB.concatenaCategoriasSubcategorias}"
+								update="busca:livroDetalhes busca:configLivro"
+								oncomplete="PF('dialogLivro').show()"
+								style="witdh:50px; height:50px; float:center;">
+								<f:setPropertyActionListener value="#{livro}" target="#{livroMB.livroSelecionado}" />
+							</p:commandButton>
+							<h:outputText value="#{livro.titulo}"/>
+						</h:panelGrid>
+					</p:panel>
+		</p:dataGrid>
+	
+	<p:dialog header="Detalhes do livro" widgetVar="dialogLivro" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+		<p:growl id="growlDlg" showDetail="true" life="8000" />
+        <p:outputPanel id="livroDetalhes" >
+            <p:panel >
+				<p:panelGrid  style="width:800px;" styleClass="ui-noborder">
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Título: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.titulo}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Autor: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.autor.nome}"/>
+					</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Sinopse: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel value="#{livroMB.livroSelecionado.sinopse}" style="width:100%"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Categorias: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.catString}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Subcategorias: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.subcatString}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Id: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.id}"/>
+						</p:column>
+					
+						<p:column colspan="1">
+							<p:outputLabel value="Data de cadastro: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.dtCadastro}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Ano :" style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.ano}"/>
+						</p:column>
+					
+						<p:column colspan="1">
+							<p:outputLabel value="Edição: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.edicao}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Páginas: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.numPaginas}"/>
+						</p:column>
+					
+						<p:column colspan="1">
+							<p:outputLabel value="Cód. barras: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.codBarras}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Editora: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.editora.nome}"/>
+						</p:column>
+					
+						<p:column colspan="1">
+							<p:outputLabel value="Grupo de precificação: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel style="width:100%" value="#{livroMB.livroSelecionado.grupoPrec.nome}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Altura: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel value="#{livroMB.livroSelecionado.dimensoes.altura}" style="width:100%"/>
+						</p:column>
+					
+						<p:column colspan="1">
+							<p:outputLabel value="Largura: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel value="#{livroMB.livroSelecionado.dimensoes.largura}" style="width:100%"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Peso: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel value="#{livroMB.livroSelecionado.dimensoes.peso}" style="width:100%"/>
+						</p:column>
+					
+						<p:column colspan="1">
+							<p:outputLabel value="Profundidade: " style="font-weight:bold; margin-right:10px"/>
+							<p:outputLabel value="#{livroMB.livroSelecionado.dimensoes.profundidade}" style="width:100%"/>
+						</p:column>
+					</p:row>
+					<p:row>
+				        <p:column colspan="2" styleClass="ui-widget-header">
+				            <p:spacer value="s" height="0"/>
+				        </p:column>
+				    </p:row>
+	        		<p:row>
+	        			<p:column colspan="1">
+	        				<p:outputLabel value="Status: " style="font-weight:bold; margin-right:10px"/>
+	        				<p:outputLabel value="#{livroMB.livroSelecionado.ativo==true?'Ativo':'Inativo'}"/>
+	        			</p:column>
+	        		</p:row>
+	        		<p:row>
+	        			<p:column colspan="1">
+	        				<p:outputLabel value="Categoria de ativação / inativação: "  style="font-weight:bold; margin-right:10px"/>
+	        				<p:outputLabel value="#{livroMB.livroSelecionado.catAtivInativacao.nome}"/>
+	        			</p:column>
+	        		</p:row>
+	        		<p:row>
+	        			<p:column colspan="1">
+	        				<p:outputLabel value="Justificativa: "  style="font-weight:bold; margin-right:10px"/>
+	        				<p:outputLabel value="#{livroMB.livroSelecionado.justificativa}"/>
+	        			</p:column>
+	        		</p:row>
+				</p:panelGrid>
+			</p:panel>
+        </p:outputPanel>
+        
+        <p:commandButton value="Alterar livro" action="#{livroMB.editarLivro}"/>
+        <p:commandButton value="Alterar estoque"/>
+        <p:commandButton value="Excluir livro" actionListener="#{livroMB.excluirLivro}" oncomplete="PF('dialogLivro').hide()" update="growlDlg"/>
+                
+        	<p:panelGrid styleClass="ui-noborder">
+        		
+        	</p:panelGrid>
+        <fieldset style="margin-top:20px">
+        	<legend>Configurações de livro</legend>
+        	<p:panelGrid id="configLivro" styleClass="ui-noborder">
+        		<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Status: " style="font-weight:bold; margin-right:10px"/>
+							<p:selectOneRadio value="#{livroMB.status}">
+								<f:selectItem itemLabel="Ativo" itemValue="true"/>
+								<f:selectItem itemLabel="Inativo" itemValue="false"/>
+									<p:ajax listener="#{livroMB.carregaCatAtivas}" update="busca:dropDownCat"/>
+							</p:selectOneRadio>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Cat. ativação / desativação: " style="font-weight:bold; margin-right:10px"/>
+							<p:selectOneMenu id="dropDownCat" value="#{livroMB.catAtivInativacao.id}" style="width:90%">
+								<f:selectItems value="#{livroMB.catAtivInativas}" var="cat" itemLabel="#{cat.nome}" itemValue="#{cat.id}" />
+						</p:selectOneMenu>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column colspan="1">
+							<p:outputLabel value="Justificativa: " style="font-weight:bold; margin-right:10px"/>
+							<p:inputTextarea value="#{livroMB.justificativa}" style="width:100%"/>
+						</p:column>
+					</p:row>
+        	</p:panelGrid>
+        </fieldset>
+        <p:commandButton value="Salvar" actionListener="#{livroMB.salvarConfigLivro}" update="growlDlg busca:livroDetalhes"/>
+    </p:dialog>
+	</h:form>
+</h:body>
+</html>

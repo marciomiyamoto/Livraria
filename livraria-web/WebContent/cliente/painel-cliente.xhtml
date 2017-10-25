@@ -1,0 +1,1462 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head></h:head>
+<h:body>
+	<h:form id="painelCliente">
+		<p:link value="Voltar" outcome="buscar.xtml" />
+		<p:growl id="growl" showDetail="true" life="8000" />
+		<fieldset>
+			<legend>Dados cadastrais</legend>
+			<p:panelGrid id="pnCliente" styleClass="ui-noborder">
+				<p:row>
+				<p:column style="vertical-align: top;">
+					<p:panelGrid styleClass="ui-noborder">
+						<p:row>
+							<p:column colspan="2">
+								<h1>Dados do cliente</h1>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Nome: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Gênero: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.genero.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Data de nascimento: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.dtNascimento}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="CPF: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.cpf}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Telefone fixo: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.numTelFixo}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Telefone celular: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.numTelCelular}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Email: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.email}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Status: " style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.ativo==true? 'Ativo' : 'Inativo'}"/>
+							</p:column>
+						</p:row>
+						<p:row><p:column></p:column></p:row>
+						<p:row>
+							<p:column colspan="2">
+								<p:commandLink value="Editar dados da conta" oncomplete="PF('dlgAltCliente').show()" update="painelCliente:dlgAltCliente" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="2">
+								<p:commandLink value="Alterar senha" oncomplete="PF('dlgAltSenha').show()" update="painelCliente:dlgAltSenha"/>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{painelClienteMB.cliente.ativo == true}">
+							<p:column colspan="2">
+								<p:commandLink value="Inativar cliente" action="#{painelClienteMB.inativarCliente}" update="painelCliente:pnCliente growl"/>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{painelClienteMB.cliente.ativo != true}">
+							<p:column colspan="2">
+								<p:commandLink value="Ativar cliente" action="#{painelClienteMB.ativarCliente}" update="painelCliente:pnCliente growl"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="2">
+								<p:commandLink value="Pedidos"/>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:column>
+				
+				<p:column style="width:50px;"></p:column>
+				
+				<p:column style="vertical-align: top;">
+					<h1>Endereço residencial</h1>
+					<p:outputLabel value="Nenhum endereço cadastrado" rendered="#{painelClienteMB.cliente.enderecoResidencial == null}"/>
+					<p:panelGrid rendered="#{painelClienteMB.cliente.enderecoResidencial != null}" styleClass="ui-noborder">
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Tipo de residência:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.tipoResidencia}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Tipo de logradouro:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.tipoLogradouro}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Logradouro:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.logradouro}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Número:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.numero}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Bairro:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.bairro}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="CEP:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.cep}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="País:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.cidade.estado.pais.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Estado:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.cidade.estado.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Cidade:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.cidade.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Observações:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.observacoes}"/>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<p:panelGrid styleClass="ui-noborder">
+						<p:row>
+							<p:column>
+								<p:commandLink value="Editar" oncomplete="PF('dlgEditarEnd').show()" update="painelCliente:dlgEditarEnd">
+									<f:setPropertyActionListener value="#{painelClienteMB.cliente.enderecoResidencial}" target="#{painelClienteMB.endereco}" />
+								</p:commandLink>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					
+					<h1>Endereço de cobrança</h1>
+					<p:outputLabel value="Nenhum endereço cadastrado" rendered="#{painelClienteMB.cliente.endCobranca == null}"/>
+					<p:panelGrid rendered="#{painelClienteMB.cliente.endCobranca != null}" styleClass="ui-noborder">
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Tipo de residência:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.tipoResidencia}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Tipo de logradouro:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.tipoLogradouro}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Logradouro:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.logradouro}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Número:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.numero}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Bairro:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.bairro}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="CEP:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.cep}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="País:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.cidade.estado.pais.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Estado:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.cidade.estado.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Cidade:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca .cidade.nome}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Observações:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.observacoes}"/>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					
+					<p:panelGrid styleClass="ui-noborder">
+						<p:row rendered="#{painelClienteMB.cliente.endCobranca == null}">
+							<p:column>
+								<p:commandLink value="Adicionar" oncomplete="PF('dlgAdicEndCob').show()"/>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{painelClienteMB.cliente.endCobranca != null}">
+							<p:column>
+								<p:commandLink value="Editar" oncomplete="PF('dlgEditarEnd').show()" update="painelCliente:dlgEditarEnd">
+									<f:setPropertyActionListener value="#{painelClienteMB.cliente.endCobranca}" target="#{painelClienteMB.endereco}" />
+								</p:commandLink>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{painelClienteMB.cliente.endCobranca != null}">
+							<p:column>
+								<p:commandLink value="Excluir" action="#{painelClienteMB.excluirEndereco(painelClienteMB.cliente.endCobranca)}" update="painelCliente:pnCliente"/>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					
+					<h1>Endereços preferencial</h1>
+					<p:outputLabel value="Nenhum endereço cadastrado" rendered="#{painelClienteMB.cliente.endsEntrega.size() == 0}"/>
+						<p:panelGrid rendered="#{painelClienteMB.cliente.endPreferencial != null}" styleClass="ui-noborder">
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Título:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.titulo}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Tipo de residência:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.tipoResidencia}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Tipo de logradouro:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.tipoLogradouro}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Logradouro:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.logradouro}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Número:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.numero}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Bairro:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.bairro}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="CEP:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.cep}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="País:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.cidade.estado.pais.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Estado:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.cidade.estado.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Cidade:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.cidade.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Observações:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.endPreferencial.observacoes}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+						<p:panelGrid styleClass="ui-noborder">
+							<p:row rendered="#{painelClienteMB.cliente.endPreferencial == null}">
+								<p:column>
+									<p:commandLink value="Adicionar" oncomplete="PF('dlgAdicEndPref').show()"/>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{painelClienteMB.cliente.endPreferencial != null}">
+								<p:column>
+									<p:commandLink value="Editar" oncomplete="PF('dlgEditarEnd').show()" update="painelCliente:dlgEditarEnd">
+										<f:setPropertyActionListener value="#{painelClienteMB.cliente.endPreferencial}" target="#{painelClienteMB.endereco}" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{painelClienteMB.cliente.endPreferencial != null}">
+								<p:column>
+									<p:commandLink value="Excluir" action="#{painelClienteMB.excluirEndereco(painelClienteMB.cliente.endPreferencial)}" update="painelCliente:pnCliente"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+				
+					<h1>Endereços de entrega</h1>
+					<p:outputLabel value="Nenhum endereço cadastrado" rendered="#{painelClienteMB.cliente.endsEntrega.size() == 0}"/>
+					<ui:repeat var="end" value="#{painelClienteMB.cliente.endsEntrega}">
+						<p:panelGrid rendered="#{painelClienteMB.cliente.endsEntrega.size() != 0}" styleClass="ui-noborder">
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Título:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.titulo}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Tipo de residência:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.tipoResidencia}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Tipo de logradouro:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.tipoLogradouro}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Logradouro:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.logradouro}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Número:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.numero}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Bairro:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.bairro}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="CEP:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.cep}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="País:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.cidade.estado.pais.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Estado:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.cidade.estado.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Cidade:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.cidade.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Observações:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{end.observacoes}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+						<p:panelGrid styleClass="ui-noborder">
+							<p:row>
+								<p:column>
+									<p:commandLink value="Adicionar" oncomplete="PF('dlgAdicEnd').show()"/>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{painelClienteMB.cliente.endsEntrega.size() != 0}">
+								<p:column>
+									<p:commandLink value="Editar" oncomplete="PF('dlgEditarEnd').show()" update="painelCliente:dlgEditarEnd">
+										<f:setPropertyActionListener value="#{end}" target="#{painelClienteMB.endereco}" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{painelClienteMB.cliente.endsEntrega.size() != 0}">
+								<p:column>
+									<p:commandLink value="Excluir" action="#{painelClienteMB.excluirEndereco(end)}" update="painelCliente:pnCliente"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</ui:repeat>
+					<p:panelGrid styleClass="ui-noborder">
+							<p:row>
+								<p:column>
+									<p:commandLink value="Adicionar" oncomplete="PF('dlgAdicEnd').show()" rendered="#{painelClienteMB.cliente.endsEntrega.size() == 0}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+				</p:column>
+				
+				<p:column style="width:50px;"></p:column>
+				
+				<p:column style="vertical-align: top;">
+					<h1>Cartão preferencial</h1>
+					<p:outputLabel value="Nenhum cartão cadastrado" rendered="#{painelClienteMB.cliente.cartaoPreferencial == null}"/>
+						<p:panelGrid styleClass="ui-noborder" rendered="#{painelClienteMB.cliente.cartaoPreferencial != null}">
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Nome impresso:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.cartaoPreferencial.nomeImpresso}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Número do cartão:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.cartaoPreferencial.numero}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Bandeira:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.cartaoPreferencial.bandeira.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Data de vencimento:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.cartaoPreferencial.dtVencimento}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Cód segurança:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{painelClienteMB.cliente.cartaoPreferencial.codSeguranca}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+						<p:panelGrid styleClass="ui-noborder">
+							<p:row rendered="#{painelClienteMB.cliente.cartaoPreferencial == null}">
+								<p:column>
+									<p:commandLink value="Adicionar" oncomplete="PF('dlgNovoCartao').show()"/>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{painelClienteMB.cliente.cartaoPreferencial != null}">
+								<p:column>
+									<p:commandLink value="Editar" oncomplete="PF('dlgEditarCartao').show()" update="painelCliente:dlgEditarCartao">
+										<f:setPropertyActionListener value="#{painelClienteMB.cliente.cartaoPreferencial}" target="#{painelClienteMB.cartao}" />
+									</p:commandLink>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{painelClienteMB.cliente.cartaoPreferencial != null}">
+								<p:column>
+									<p:commandLink value="Excluir" action="#{painelClienteMB.excluirCartao(painelClienteMB.cliente.cartaoPreferencial)}" update="painelCliente:pnCliente"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+						<h1>Outros cartões</h1>
+						<p:outputLabel value="Nenhum cartão cadastrado" rendered="#{painelClienteMB.cliente.cartoes.size() == 0}"/>
+						<ui:repeat var="cart" value="#{painelClienteMB.cliente.cartoes}">
+						<p:panelGrid styleClass="ui-noborder">
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Nome impresso:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{cart.nomeImpresso}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Número do cartão:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{cart.numero}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Bandeira:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{cart.bandeira.nome}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Data de vencimento:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{cart.dtVencimento}"/>
+								</p:column>
+							</p:row>
+							<p:row>
+								<p:column>
+									<p:outputLabel value="Cód segurança:" style="font-weight: bold;"/>
+								</p:column>
+								<p:column>
+									<h:outputText value="#{cart.codSeguranca}"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					<p:panelGrid styleClass="ui-noborder">
+						<p:row>
+							<p:column>
+								<p:commandLink value="Adicionar" oncomplete="PF('dlgNovoCartao').show()"/>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{painelClienteMB.cliente.cartoes != null}">
+							<p:column>
+								<p:commandLink value="Editar" oncomplete="PF('dlgEditarCartao').show()" update="painelCliente:dlgEditarCartao">
+									<f:setPropertyActionListener value="#{cart}" target="#{painelClienteMB.cartao}" />
+								</p:commandLink>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{painelClienteMB.cliente.cartoes != null}">
+							<p:column>
+								<p:commandLink value="Excluir" action="#{painelClienteMB.excluirCartao(cart)}" update="painelCliente:pnCliente"/>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					</ui:repeat>
+					<p:panelGrid rendered="#{painelClienteMB.cliente.cartoes.size() == 0}" styleClass="ui-noborder">
+						<p:row>
+							<p:column>
+								<p:commandLink value="Adicionar" oncomplete="PF('dlgNovoCartao').show()" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:column>
+				</p:row>
+			</p:panelGrid>
+		</fieldset>
+		
+		<p:dialog header="Alterar cliente" id="dlgAltCliente" widgetVar="dlgAltCliente" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Nome"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cliente.nome}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="CPF"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cliente.cpf}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Data de nascimento"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputMask value="#{painelClienteMB.maskDtNascimento}" mask="99/99/9999"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Gênero"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.cliente.genero.id}">
+							<f:selectItems value="#{painelClienteMB.generos}" var="ger" itemLabel="#{ger.nome}" itemValue="#{ger.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Email"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cliente.email}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.alterarCliente}" oncomplete="PF('dlgAltCliente').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Alterar senha" id="dlgAltSenha" widgetVar="dlgAltSenha" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Senha antiga"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:password value="#{painelClienteMB.senhaAntiga}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Nova senha"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:password value="#{painelClienteMB.senhaNova}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Repetir nova senha"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:password value="#{painelClienteMB.senhaRepetida}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.alterarSenha}" oncomplete="PF('dlgAltSenha').hide()" update="growl"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Adicionar cartão" widgetVar="dlgNovoCartao" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Nome impresso no cartão"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cartaoSalvar.nomeImpresso}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número do cartão"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cartaoSalvar.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bandeira"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.bandeiraSalvar.id}">
+							<f:selectItems value="#{painelClienteMB.bandeiras}" var="ban" itemLabel="#{ban.nome}" itemValue="#{ban.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Data de validade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputMask value="#{painelClienteMB.maskDtVencimentoSalvar}" mask="99/9999" placeholder="MM/AAAA"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Código de segurança"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cartaoSalvar.codSeguranca}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectBooleanCheckbox value="#{painelClienteMB.cartaoPreferencial}" style="margin-right:10px;"/>
+						<h:outputText value="Cartão preferencial"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.cadastrarCartao}" oncomplete="PF('dlgNovoCartao').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Editar cartão" id="dlgEditarCartao" widgetVar="dlgEditarCartao" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Nome impresso no cartão"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cartao.nomeImpresso}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número do cartão"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cartao.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bandeira"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.bandeira.id}">
+							<f:selectItems value="#{painelClienteMB.bandeiras}" var="ban" itemLabel="#{ban.nome}" itemValue="#{ban.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Data de validade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputMask value="#{painelClienteMB.maskDtVencimento}" mask="99/9999" placeholder="MM/AAAA"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Código de segurança"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.cartao.codSeguranca}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectBooleanCheckbox value="#{painelClienteMB.cartaoPrefEdit}" style="margin-right:10px;"/>
+						<h:outputText value="Cartão preferencial"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.alterarCartao}" oncomplete="PF('dlgEditarCartao').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Adicionar endereço" id="dlgAdicEnd" widgetVar="dlgAdicEnd" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Título"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.titulo}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de residência"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.tipoResidencia}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.tipoLogradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.logradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bairro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.bairro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="CEP"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.cep}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="País"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.paisSalvar.id}" >
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.paisesSalvar}" var="pais" itemLabel="#{pais.nome}" itemValue="#{pais.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularEstadosSalvar}" update="painelCliente:dropDownEstadosSalvar dropDownCidadesSalvar"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Estado"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownEstadosSalvar" value="#{painelClienteMB.estadoSalvar.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.estadosSalvar}" var="est" itemLabel="#{est.nome}" itemValue="#{est.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularCidadesSalvar}" update="painelCliente:dropDownCidadesSalvar"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Cidade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownCidadesSalvar" value="#{painelClienteMB.cidadeSalvar.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.cidadesSalvar}" var="cid" itemLabel="#{cid.nome}" itemValue="#{cid.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Observações"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endSelecionado.observacoes}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectBooleanCheckbox value="#{painelClienteMB.endPreferencial}" style="margin-right:10px;"/>
+						<h:outputText value="Endereço preferencial"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.salvarEndereco}" oncomplete="PF('dlgAdicEnd').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Adicionar endereço de cobrança" id="dlgAdicEndCob" widgetVar="dlgAdicEndCob" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de residência"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.tipoResidencia}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.tipoLogradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.logradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bairro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.bairro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="CEP"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.cep}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="País"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.paisCobSalvar.id}" >
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.paisesCobSalvar}" var="pais" itemLabel="#{pais.nome}" itemValue="#{pais.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularEstadosCobSalvar}" update="painelCliente:dropDownEstadosCobSalvar dropDownCidadesCobSalvar"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Estado"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownEstadosCobSalvar" value="#{painelClienteMB.estadoCobSalvar.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.estadosCobSalvar}" var="est" itemLabel="#{est.nome}" itemValue="#{est.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularCidadesCobSalvar}" update="painelCliente:dropDownCidadesCobSalvar"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Cidade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownCidadesCobSalvar" value="#{painelClienteMB.cidadeCobSalvar.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.cidadesCobSalvar}" var="cid" itemLabel="#{cid.nome}" itemValue="#{cid.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Observações"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endCobrSalvar.observacoes}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.salvarEndCobranca}" oncomplete="PF('dlgAdicEndCob').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Adicionar endereço preferencial" id="dlgAdicEndPref" widgetVar="dlgAdicEndPref" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Título"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.titulo}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de residência"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.tipoResidencia}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.tipoLogradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.logradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bairro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.bairro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="CEP"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.cep}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="País"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.paisPrefSalvar.id}" >
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.paisesPrefSalvar}" var="pais" itemLabel="#{pais.nome}" itemValue="#{pais.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularEstadosPrefSalvar}" update="painelCliente:dropDownEstadosPrefSalvar dropDownCidadesPrefSalvar"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Estado"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownEstadosPrefSalvar" value="#{painelClienteMB.estadoPrefSalvar.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.estadosPrefSalvar}" var="est" itemLabel="#{est.nome}" itemValue="#{est.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularCidadesPrefSalvar}" update="painelCliente:dropDownCidadesPrefSalvar"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Cidade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownCidadesPrefSalvar" value="#{painelClienteMB.cidadePrefSalvar.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.cidadesPrefSalvar}" var="cid" itemLabel="#{cid.nome}" itemValue="#{cid.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Observações"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endPrefSalvar.observacoes}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.salvarEndPref}" oncomplete="PF('dlgAdicEndPref').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Editar endereço" id="dlgEditarEnd" widgetVar="dlgEditarEnd" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Título"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.titulo}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de residência"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.tipoResidencia}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.tipoLogradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.logradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bairro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.bairro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="CEP"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.cep}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="País"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{painelClienteMB.paisSelecionado.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.paises}" var="pais" itemLabel="#{pais.nome}" itemValue="#{pais.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularEstados}" update="painelCliente:dropDownEstados dropDownCidades"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Estado"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownEstados" value="#{painelClienteMB.estadoSelecionado.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.estados}" var="est" itemLabel="#{est.nome}" itemValue="#{est.id}"/>
+								<p:ajax listener="#{painelClienteMB.popularCidades}" update="painelCliente:dropDownCidades"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Cidade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu id="dropDownCidades" value="#{painelClienteMB.cidadeSelecionada.id}">
+							<f:selectItem itemLabel="--SELECIONE--"/>
+							<f:selectItems value="#{painelClienteMB.cidades}" var="cid" itemLabel="#{cid.nome}" itemValue="#{cid.id}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Observações"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{painelClienteMB.endereco.observacoes}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectBooleanCheckbox value="#{painelClienteMB.endPrefEdit}" style="margin-right:10px;"/>
+						<h:outputText value="Endereço preferencial"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:commandButton value="Salvar" actionListener="#{painelClienteMB.alterarEndereco}" oncomplete="PF('dlgEditarEnd').hide()" update="growl painelCliente:pnCliente"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:dialog>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	
+<h:head></h:head>
+<h:body>
+	<h:form id="home">
+		<p:dataGrid id="dgLivros" var="livro" value="#{vendaMB.livros}" columns="8" layout="grid" style="margin-top:10px;text-align: start;"
+					rows="16" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="16, 32, 64">					
+					<p:panel>
+						<h:panelGrid columns="1" style="width:50px;" >
+							<p:commandButton 
+								ajax="false"
+								action="livro.xhtml?faces-redirect=true"
+								style="witdh:50px; height:50px; float:center;">
+								<f:setPropertyActionListener value="#{livro}" target="#{vendaMB.livroSelecionado}" />
+							</p:commandButton>
+							<h:outputText value="#{livro.titulo}"/>
+						</h:panelGrid>
+					</p:panel>
+		</p:dataGrid>
+	</h:form>
+</h:body>
+</html>
