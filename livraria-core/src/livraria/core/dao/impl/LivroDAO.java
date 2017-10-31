@@ -397,6 +397,9 @@ public class LivroDAO extends AbstractJdbcDAO {
 		sql.append("JOIN categoria c ON l.id_catativinativacao = c.id ");
 		sql.append("WHERE 1=1 ");
 		
+		if(filtro.getId() != null && filtro.getId() != 0) {
+			sql.append("AND l.id = ? ");
+		}
 		if(filtro.getTitulo() != null && !filtro.getTitulo().equals("")) {
 			sql.append("AND titulo = ? ");
 		}
@@ -449,6 +452,9 @@ public class LivroDAO extends AbstractJdbcDAO {
 			pst = connection.prepareStatement(sql.toString());
 			int i = 1;
 			
+			if(filtro.getId() != null && filtro.getId() != 0) {
+				pst.setInt(i, filtro.getId());
+			}
 			if(filtro.getTitulo() != null && !filtro.getTitulo().equals("")) {
 				pst.setString(i, filtro.getTitulo());
 				i++;

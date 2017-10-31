@@ -10,7 +10,7 @@ public class Pedido extends EntidadeDominio {
 	private Double valorTotal;
 	private Cliente cliente;
 	private CustoFrete custoFrete;
-	private EnumStatusPedido statusPedido;
+	private Integer statusPedido;
 	private List<Pagamento> pagamentos;
 	private List<ItemPedido> itens;
 	
@@ -32,10 +32,10 @@ public class Pedido extends EntidadeDominio {
 	public void setCustoFrete(CustoFrete custoFrete) {
 		this.custoFrete = custoFrete;
 	}
-	public EnumStatusPedido getStatusPedido() {
+	public Integer getStatusPedido() {
 		return statusPedido;
 	}
-	public void setStatusPedido(EnumStatusPedido statusPedido) {
+	public void setStatusPedido(Integer statusPedido) {
 		this.statusPedido = statusPedido;
 	}
 	public List<Pagamento> getPagamentos() {
@@ -91,7 +91,10 @@ public class Pedido extends EntidadeDominio {
 				return false;
 		} else if (!pagamentos.equals(other.pagamentos))
 			return false;
-		if (statusPedido != other.statusPedido)
+		if (statusPedido == null) {
+			if (other.statusPedido != null)
+				return false;
+		} else if (!statusPedido.equals(other.statusPedido))
 			return false;
 		if (valorTotal == null) {
 			if (other.valorTotal != null)

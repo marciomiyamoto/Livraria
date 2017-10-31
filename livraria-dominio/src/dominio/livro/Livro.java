@@ -21,6 +21,7 @@ public class Livro extends EntidadeDominio {
 	private Editora editora;
 	private Dimensoes dimensoes;
 	private GrupoDePrecificacao grupoPrec;
+	private Double precoVenda;
 	public String getTitulo() {
 		return titulo;
 	}
@@ -111,6 +112,12 @@ public class Livro extends EntidadeDominio {
 	public void setCatAtivInativacao(Categoria catAtivInativacao) {
 		this.catAtivInativacao = catAtivInativacao;
 	}
+	public Double getPrecoVenda() {
+		return precoVenda;
+	}
+	public void setPrecoVenda(Double precoVenda) {
+		this.precoVenda = precoVenda;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -127,6 +134,7 @@ public class Livro extends EntidadeDominio {
 		result = prime * result + ((grupoPrec == null) ? 0 : grupoPrec.hashCode());
 		result = prime * result + ((justificativa == null) ? 0 : justificativa.hashCode());
 		result = prime * result + ((numPaginas == null) ? 0 : numPaginas.hashCode());
+		result = prime * result + ((precoVenda == null) ? 0 : precoVenda.hashCode());
 		result = prime * result + ((sinopse == null) ? 0 : sinopse.hashCode());
 		result = prime * result + ((subcategorias == null) ? 0 : subcategorias.hashCode());
 		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
@@ -201,6 +209,11 @@ public class Livro extends EntidadeDominio {
 				return false;
 		} else if (!numPaginas.equals(other.numPaginas))
 			return false;
+		if (precoVenda == null) {
+			if (other.precoVenda != null)
+				return false;
+		} else if (!precoVenda.equals(other.precoVenda))
+			return false;
 		if (sinopse == null) {
 			if (other.sinopse != null)
 				return false;
@@ -224,7 +237,7 @@ public class Livro extends EntidadeDominio {
 				+ ", codBarras=" + codBarras + ", ativo=" + ativo + ", sinopse=" + sinopse + ", justificativa="
 				+ justificativa + ", autor=" + autor + ", catAtivInativacao=" + catAtivInativacao + ", categorias="
 				+ categorias + ", subcategorias=" + subcategorias + ", editora=" + editora + ", dimensoes=" + dimensoes
-				+ ", grupoPrec=" + grupoPrec + "]";
+				+ ", grupoPrec=" + grupoPrec + ", precoVenda=" + precoVenda + "]";
 	}
 	
 }

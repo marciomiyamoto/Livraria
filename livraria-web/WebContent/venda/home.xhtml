@@ -10,7 +10,9 @@
 <h:head></h:head>
 <h:body>
 	<h:form id="home">
-		<p:dataGrid id="dgLivros" var="livro" value="#{vendaMB.livros}" columns="8" layout="grid" style="margin-top:10px;text-align: start;"
+		<p:link value="Carrinho" outcome="carrinho.xhtml" style="float:right;"/>
+		<p:spacer/>
+		<p:dataGrid id="dgLivros" var="estoque" value="#{vendaMB.estoques}" columns="8" layout="grid" style="margin-top:10px;text-align: start;"
 					rows="16" paginator="true"
 					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 					rowsPerPageTemplate="16, 32, 64">					
@@ -18,11 +20,15 @@
 						<h:panelGrid columns="1" style="width:50px;" >
 							<p:commandButton 
 								ajax="false"
+								
 								action="livro.xhtml?faces-redirect=true"
 								style="witdh:50px; height:50px; float:center;">
-								<f:setPropertyActionListener value="#{livro}" target="#{vendaMB.livroSelecionado}" />
+								<f:setPropertyActionListener value="#{estoque}" target="#{vendaMB.estoqueSelecionado}" /> 
 							</p:commandButton>
-							<h:outputText value="#{livro.titulo}"/>
+							<h:outputText value="#{estoque.livro.titulo}"/>
+							<h:outputText value="#{estoque.livro.precoVenda}">
+								<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+							</h:outputText>
 						</h:panelGrid>
 					</p:panel>
 		</p:dataGrid>

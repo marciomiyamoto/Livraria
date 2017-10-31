@@ -6,7 +6,7 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
-<head></head>
+<h:head/>
 <h:body>
 	<h:form id="livro">
 		<p:panelGrid >
@@ -15,7 +15,7 @@
 					<h:outputText value="Título: "/>
 				</p:column>
 				<p:column>
-					<h:outputText value="#{vendaMB.livroSelecionado.titulo}"/>
+					<h:outputText value="#{vendaMB.estoqueSelecionado.livro.titulo}"/>
 				</p:column>
 			</p:row>
 			<p:row>
@@ -23,7 +23,26 @@
 					<h:outputText value="Qtde: "/>
 				</p:column>
 				<p:column>
-					<p:spinner id="minMax" min="0" max="100" />
+					<p:spinner value="#{vendaMB.qtdeItemPedido}" id="minMax" min="0" max="100" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputText value="Estoque: "/>
+				</p:column>
+				<p:column>
+					<h:outputText value="#{vendaMB.estoqueSelecionado.qtdeTotal}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<p:commandButton
+						value="Comprar"
+						ajax="false"
+						actionListener="#{vendaMB.adicionarItemCarrinho}"
+						action="carrinho.xhtml?faces-redirect=true"
+						/>
+					
 				</p:column>
 			</p:row>
 		</p:panelGrid>

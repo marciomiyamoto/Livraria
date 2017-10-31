@@ -1,29 +1,31 @@
 package dominio.venda;
 
 import dominio.EntidadeDominio;
+import dominio.livro.Estoque;
 import dominio.livro.Livro;
 
 public class ItemPedido extends EntidadeDominio {
 	
 	private Integer qtde;
-	private Livro livro;
+	private Estoque estoque;
+	
 	public Integer getQtde() {
 		return qtde;
 	}
 	public void setQtde(Integer qtde) {
 		this.qtde = qtde;
 	}
-	public Livro getLivro() {
-		return livro;
+	public Estoque getEstoque() {
+		return estoque;
 	}
-	public void setLivro(Livro livro) {
-		this.livro = livro;
+	public void setEstoque(Estoque estoque) {
+		this.estoque = estoque;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((livro == null) ? 0 : livro.hashCode());
+		result = prime * result + ((estoque == null) ? 0 : estoque.hashCode());
 		result = prime * result + ((qtde == null) ? 0 : qtde.hashCode());
 		return result;
 	}
@@ -36,10 +38,10 @@ public class ItemPedido extends EntidadeDominio {
 		if (getClass() != obj.getClass())
 			return false;
 		ItemPedido other = (ItemPedido) obj;
-		if (livro == null) {
-			if (other.livro != null)
+		if (estoque == null) {
+			if (other.estoque != null)
 				return false;
-		} else if (!livro.equals(other.livro))
+		} else if (!estoque.equals(other.estoque))
 			return false;
 		if (qtde == null) {
 			if (other.qtde != null)
@@ -50,7 +52,7 @@ public class ItemPedido extends EntidadeDominio {
 	}
 	@Override
 	public String toString() {
-		return "ItemPedido [qtde=" + qtde + ", livro=" + livro + "]";
+		return "ItemPedido [qtde=" + qtde + ", estoque=" + estoque + "]";
 	}
 
 }

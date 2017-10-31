@@ -6,8 +6,8 @@ public class Registro extends EntidadeDominio {
 	private Integer qtde;
 	private Double valorCompra;
 	private Double valorVenda;
-	private Livro livro;
-	private EnumTipoRegistroEstoque tipoRegistro;
+	private Integer idEstoque;
+	private Integer tipoRegistro;
 	
 	public Integer getQtde() {
 		return qtde;
@@ -27,23 +27,23 @@ public class Registro extends EntidadeDominio {
 	public void setValorVenda(Double valorVenda) {
 		this.valorVenda = valorVenda;
 	}
-	public Livro getLivro() {
-		return livro;
+	public Integer getIdEstoque() {
+		return idEstoque;
 	}
-	public void setLivro(Livro livro) {
-		this.livro = livro;
+	public void setIdEstoque(Integer idEstoque) {
+		this.idEstoque = idEstoque;
 	}
-	public EnumTipoRegistroEstoque getTipoRegistro() {
+	public Integer getTipoRegistro() {
 		return tipoRegistro;
 	}
-	public void setTipoRegistro(EnumTipoRegistroEstoque tipoRegistro) {
+	public void setTipoRegistro(Integer tipoRegistro) {
 		this.tipoRegistro = tipoRegistro;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((livro == null) ? 0 : livro.hashCode());
+		result = prime * result + ((idEstoque == null) ? 0 : idEstoque.hashCode());
 		result = prime * result + ((qtde == null) ? 0 : qtde.hashCode());
 		result = prime * result + ((tipoRegistro == null) ? 0 : tipoRegistro.hashCode());
 		result = prime * result + ((valorCompra == null) ? 0 : valorCompra.hashCode());
@@ -59,17 +59,20 @@ public class Registro extends EntidadeDominio {
 		if (getClass() != obj.getClass())
 			return false;
 		Registro other = (Registro) obj;
-		if (livro == null) {
-			if (other.livro != null)
+		if (idEstoque == null) {
+			if (other.idEstoque != null)
 				return false;
-		} else if (!livro.equals(other.livro))
+		} else if (!idEstoque.equals(other.idEstoque))
 			return false;
 		if (qtde == null) {
 			if (other.qtde != null)
 				return false;
 		} else if (!qtde.equals(other.qtde))
 			return false;
-		if (tipoRegistro != other.tipoRegistro)
+		if (tipoRegistro == null) {
+			if (other.tipoRegistro != null)
+				return false;
+		} else if (!tipoRegistro.equals(other.tipoRegistro))
 			return false;
 		if (valorCompra == null) {
 			if (other.valorCompra != null)
@@ -85,8 +88,8 @@ public class Registro extends EntidadeDominio {
 	}
 	@Override
 	public String toString() {
-		return "Registro [qtde=" + qtde + ", valorCompra=" + valorCompra + ", valorVenda=" + valorVenda + ", livro="
-				+ livro + ", tipoRegistro=" + tipoRegistro + "]";
+		return "Registro [qtde=" + qtde + ", valorCompra=" + valorCompra + ", valorVenda=" + valorVenda + ", idEstoque="
+				+ idEstoque + ", tipoRegistro=" + tipoRegistro + "]";
 	}
 	
 }
