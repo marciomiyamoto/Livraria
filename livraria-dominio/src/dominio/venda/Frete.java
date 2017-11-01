@@ -9,7 +9,7 @@ public class Frete extends EntidadeDominio {
 	private Integer qtde;
 	private String cepOrigem;
 	private String cepDestino;
-	private EnumTipoEnvio tipoEnvio;
+	private Integer tipoEnvio;
 	
 	public Livro getLivro() {
 		return livro;
@@ -35,10 +35,10 @@ public class Frete extends EntidadeDominio {
 	public void setCepDestino(String cepDestino) {
 		this.cepDestino = cepDestino;
 	}
-	public EnumTipoEnvio getTipoEnvio() {
+	public Integer getTipoEnvio() {
 		return tipoEnvio;
 	}
-	public void setTipoEnvio(EnumTipoEnvio tipoEnvio) {
+	public void setTipoEnvio(Integer tipoEnvio) {
 		this.tipoEnvio = tipoEnvio;
 	}
 	@Override
@@ -81,7 +81,10 @@ public class Frete extends EntidadeDominio {
 				return false;
 		} else if (!qtde.equals(other.qtde))
 			return false;
-		if (tipoEnvio != other.tipoEnvio)
+		if (tipoEnvio == null) {
+			if (other.tipoEnvio != null)
+				return false;
+		} else if (!tipoEnvio.equals(other.tipoEnvio))
 			return false;
 		return true;
 	}

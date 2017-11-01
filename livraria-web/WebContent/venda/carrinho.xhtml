@@ -14,7 +14,9 @@
 					<h:outputText value="#{item.estoque.livro.titulo}"/>
 				</p:column>
 				<p:column headerText="Preço un.">
-					<h:outputText value="#{item.estoque.livro.precoVenda}"/>
+					<h:outputText value="#{item.estoque.livro.precoVenda}">
+						<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+					</h:outputText>
 				</p:column>
 				<p:column headerText="Qtde">
 					<p:spinner value="#{item.qtde}" min="0" max="100">
@@ -33,7 +35,7 @@
 					<h:outputText value="CEP:"/>
 				</p:column>
 				<p:column>
-					<p:inputText value=""/>
+					<p:inputText/>
 				</p:column>
 			</p:row>
 			<p:row>
@@ -46,12 +48,28 @@
 					<h:outputText value="Valor total:"/>
 				</p:column>
 				<p:column>
-					<h:outputText value="#{vendaMB.pedido.valorTotal}"/>
+					<h:outputText value="#{vendaMB.pedido.valorTotal}">
+						<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+					</h:outputText>
 				</p:column>
 			</p:row>
 			<p:row>
 				<p:column>
-					<p:commandButton value="Finalizar compra"/>
+					<h:outputText value="Cliente:"/>
+				</p:column>
+				<p:column>
+					<p:selectOneMenu value="#{vendaMB.cliente.id}">
+						<f:selectItems value="#{vendaMB.clientes}" var="cliente" itemLabel="#{cliente.nome}" itemValue="#{cliente.id}"/>
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<p:commandButton 
+						value="Finalizar compra" 
+						actionListener="#{vendaMB.carregarClienteSelecionado}"
+						action="pedido.xhtml?faces-redirect=true" 
+						ajax="false"/>
 				</p:column>
 			</p:row>
 		</p:panelGrid>

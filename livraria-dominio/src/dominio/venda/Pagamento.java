@@ -5,18 +5,19 @@ import dominio.EntidadeDominio;
 public class Pagamento extends EntidadeDominio {
 
 	private double valor;
-	private EnumStatusPgto status;
+	private Integer status;
 	private FormaPgto formaPgto;
+	
 	public double getValor() {
 		return valor;
 	}
 	public void setValor(double valor) {
 		this.valor = valor;
 	}
-	public EnumStatusPgto getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
-	public void setStatus(EnumStatusPgto status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 	public FormaPgto getFormaPgto() {
@@ -50,7 +51,10 @@ public class Pagamento extends EntidadeDominio {
 				return false;
 		} else if (!formaPgto.equals(other.formaPgto))
 			return false;
-		if (status != other.status)
+		if (status == null) {
+			if (other.status != null)
+				return false;
+		} else if (!status.equals(other.status))
 			return false;
 		if (Double.doubleToLongBits(valor) != Double.doubleToLongBits(other.valor))
 			return false;
