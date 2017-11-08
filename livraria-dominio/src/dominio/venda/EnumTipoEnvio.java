@@ -2,17 +2,17 @@ package dominio.venda;
 
 public enum EnumTipoEnvio {
 	
-	SEDEX(40010),
-	SEDEX10(40215),
-	PAC(41106);
+	SEDEX("04014"),
+	SEDEX10("40215"),
+	PAC("04510");
 	
-	private final int value;
+	private final String value;
 	
-	private EnumTipoEnvio(int value) {
+	private EnumTipoEnvio(String value) {
 		this.value = value;
 	}
 	
-	public int getValue() { 
+	public String getValue() { 
 		return value; 
 	}
 

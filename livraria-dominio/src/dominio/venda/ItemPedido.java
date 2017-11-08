@@ -8,6 +8,7 @@ public class ItemPedido extends EntidadeDominio {
 	
 	private Integer qtde;
 	private Estoque estoque;
+	private Integer idPedido;
 	
 	public Integer getQtde() {
 		return qtde;
@@ -21,11 +22,18 @@ public class ItemPedido extends EntidadeDominio {
 	public void setEstoque(Estoque estoque) {
 		this.estoque = estoque;
 	}
+	public Integer getIdPedido() {
+		return idPedido;
+	}
+	public void setIdPedido(Integer idPedido) {
+		this.idPedido = idPedido;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((estoque == null) ? 0 : estoque.hashCode());
+		result = prime * result + ((idPedido == null) ? 0 : idPedido.hashCode());
 		result = prime * result + ((qtde == null) ? 0 : qtde.hashCode());
 		return result;
 	}
@@ -43,6 +51,11 @@ public class ItemPedido extends EntidadeDominio {
 				return false;
 		} else if (!estoque.equals(other.estoque))
 			return false;
+		if (idPedido == null) {
+			if (other.idPedido != null)
+				return false;
+		} else if (!idPedido.equals(other.idPedido))
+			return false;
 		if (qtde == null) {
 			if (other.qtde != null)
 				return false;
@@ -52,7 +65,7 @@ public class ItemPedido extends EntidadeDominio {
 	}
 	@Override
 	public String toString() {
-		return "ItemPedido [qtde=" + qtde + ", estoque=" + estoque + "]";
+		return "ItemPedido [qtde=" + qtde + ", estoque=" + estoque + ", idPedido=" + idPedido + "]";
 	}
 
 }

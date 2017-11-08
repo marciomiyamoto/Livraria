@@ -31,6 +31,8 @@ import dominio.livro.LogLivro;
 import dominio.livro.Registro;
 import dominio.livro.Subcategoria;
 import dominio.venda.CupomPromocional;
+import dominio.venda.CupomTroca;
+import dominio.venda.Pedido;
 import livraria.core.IDAO;
 import livraria.core.IFachada;
 import livraria.core.IStrategy;
@@ -43,6 +45,7 @@ import livraria.core.dao.impl.CidadeDAO;
 import livraria.core.dao.impl.ClienteDAO;
 import livraria.core.dao.impl.ClienteEndDAO;
 import livraria.core.dao.impl.CupomPromocionalDAO;
+import livraria.core.dao.impl.CupomTrocaDAO;
 import livraria.core.dao.impl.DimensoesDAO;
 import livraria.core.dao.impl.EditoraDAO;
 import livraria.core.dao.impl.EnderecoDAO;
@@ -53,6 +56,7 @@ import livraria.core.dao.impl.GrupoDePrecificacaoDAO;
 import livraria.core.dao.impl.LivroDAO;
 import livraria.core.dao.impl.LogLivroDAO;
 import livraria.core.dao.impl.PaisDAO;
+import livraria.core.dao.impl.PedidoDAO;
 import livraria.core.dao.impl.RegistroDAO;
 import livraria.core.dao.impl.SubcategoriaDAO;
 import livraria.core.dao.impl.TelefoneDAO;
@@ -112,6 +116,8 @@ public class Fachada implements IFachada {
 		EstoqueDAO estoqueDAO = new EstoqueDAO();
 		RegistroDAO regDAO = new RegistroDAO();
 		CupomPromocionalDAO cupPromDAO = new CupomPromocionalDAO();
+		CupomTrocaDAO cupTrocaDAO = new CupomTrocaDAO();
+		PedidoDAO pedidoDAO = new PedidoDAO();
 		
 		/* Adicionando cada dao no MAP indexando pelo nome da classe */
 //		daos.put(Bebida.class.getName(), bebidaDAO);
@@ -139,6 +145,8 @@ public class Fachada implements IFachada {
 		daos.put(Estoque.class.getName(), estoqueDAO);
 		daos.put(Registro.class.getName(), regDAO);
 		daos.put(CupomPromocional.class.getName(), cupPromDAO);
+		daos.put(CupomTroca.class.getName(), cupTrocaDAO);
+		daos.put(Pedido.class.getName(), pedidoDAO);
 		
 		/* Criando instâncias de regras de negócio a serem utilizados*/		
 		ValidarDadosObrigatoriosLivro vDadosObrigatoriosLivro = new ValidarDadosObrigatoriosLivro();

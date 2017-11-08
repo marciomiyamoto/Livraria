@@ -6,6 +6,7 @@ public class Cupom extends EntidadeDominio {
 	
 	private Boolean ativo;
 	private String codigo;
+	
 	public Boolean getAtivo() {
 		return ativo;
 	}

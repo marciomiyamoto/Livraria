@@ -10,13 +10,15 @@
 <h:body>
 	<h:form id="pedido">
 		<p:growl id="growl" showDetail="true" life="8000" />
-		<p:panelGrid styleClass="ui-noborder">
+		<p:panelGrid id="pgPedido" styleClass="ui-noborder">
 			<p:row>
 				<p:column>
 					<h:outputText value="Endereço de entrega:" style="font-weight: bold;"/>
 				</p:column>
 				<p:column>
-					<p:panelGrid id="endEntrega" rendered="#{vendaMB.pedido.endEntrega != null}" styleClass="ui-noborder">
+					<p:panelGrid id="endEntrega" 
+								rendered="#{vendaMB.pedido.endEntrega != null}" 
+								styleClass="ui-noborder">
 						<p:row>
 							<p:column>
 								<p:outputLabel value="Título:" style="font-weight: bold;"/>
@@ -109,6 +111,9 @@
 							<p:column>
 								<p:commandButton value="Escolher outro endereço" oncomplete="PF('dialogEnderecos').show()" update="formEnd:end"/>
 							</p:column>
+							<p:column>
+								<p:commandButton value="Adicionar endereço" oncomplete="PF('dialogAdcEndereco').show()" update="formAdcEnd"/>
+							</p:column>
 						</p:row>
 					</p:panelGrid>
 				</p:column>
@@ -116,6 +121,61 @@
 			<p:row>
 				<p:column>
 					<h:outputText value="Frete:" style="font-weight: bold;"/>
+				</p:column>
+				<p:column>
+					<p:panelGrid>
+						<p:row>
+							<p:column>
+								<p:selectOneRadio value="#{vendaMB.radioSelFrete}" disabled="#{vendaMB.custoFretePAC.erro != '0'}">
+									<f:selectItem itemValue="pac"/>
+									<p:ajax listener="#{vendaMB.atribuirFretePedido}" update="growl pedido:pgPedido"/>
+								</p:selectOneRadio>
+							</p:column>
+							<p:column>
+								<h:outputText value="PAC: R$#{vendaMB.custoFretePAC.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel rendered="#{vendaMB.custoFretePAC.erro == '0'}" value="Prazo de entrega: #{vendaMB.custoFretePAC.prazoEntrega} dias úteis" />
+								<p:outputLabel rendered="#{vendaMB.custoFretePAC.erro != '0'}" value="Indisponível" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:selectOneRadio value="#{vendaMB.radioSelFrete}" disabled="#{vendaMB.custoFreteSedex.erro != '0'}">
+									<f:selectItem itemValue="sedex"/>
+									<p:ajax listener="#{vendaMB.atribuirFretePedido}" update="growl pedido:pgPedido"/>
+								</p:selectOneRadio>
+							</p:column>
+							<p:column>
+								<h:outputText value="Sedex: #{vendaMB.custoFreteSedex.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex.erro == '0'}" value="Prazo de entrega: #{vendaMB.custoFreteSedex.prazoEntrega} dias úteis" />
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex.erro != '0'}" value="Indisponível" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:selectOneRadio value="#{vendaMB.radioSelFrete}" disabled="#{vendaMB.custoFreteSedex10.erro != '0'}">
+									<f:selectItem  itemValue="sedex10"/>
+									<p:ajax listener="#{vendaMB.atribuirFretePedido}" update="growl pedido:pgPedido"/>
+								</p:selectOneRadio>
+							</p:column>
+							<p:column>
+								<h:outputText value="Sedex10: #{vendaMB.custoFreteSedex10.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex10.erro == '0'}" value="Prazo de entrega: #{vendaMB.custoFreteSedex10.prazoEntrega} dias úteis" />
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex10.erro != '0'}" value="Indisponível" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
 				</p:column>
 			</p:row>
 			<p:row>
@@ -132,7 +192,18 @@
 								<p:inputText value="#{vendaMB.cupomPromocional.codigo}"/>
 							</p:column>
 							<p:column>
-								<p:commandButton value="Aplicar" actionListener="#{vendaMB.aplicarCupomPromocional}" update="growl"/>
+								<p:commandButton value="Aplicar" actionListener="#{vendaMB.aplicarCupomPromocional}" update="growl pedido:pgPedido"/>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{not empty vendaMB.pedido.cupomPromocional}">
+							<p:column>
+								<h:outputText value="Cupom aplicado: "/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{vendaMB.pedido.cupomPromocional.codigo}"/>
+							</p:column>
+							<p:column>
+								<p:commandButton value="Remover" actionListener="#{vendaMB.removerCupomPromocional}" update="growl pedido:pgPedido"/>
 							</p:column>
 						</p:row>
 					</p:panelGrid>
@@ -143,70 +214,115 @@
 					<h:outputText value="Forma de pagamento:" style="font-weight: bold;"/>
 				</p:column>
 				<p:column>
-					<p:panelGrid styleClass="ui-noborder" rendered="#{vendaMB.cliente.cartaoPreferencial != null}">
-						<p:row>
-							<h:outputText value="Cartão"/>
-						</p:row>						
-						<p:row>
-							<p:column>
-								<p:outputLabel value="Nome impresso:" style="font-weight: bold;"/>
-							</p:column>
-							<p:column>
-								<h:outputText value="#{vendaMB.cliente.cartaoPreferencial.nomeImpresso}"/>
-							</p:column>
-						</p:row>
-						<p:row>
-							<p:column>
-								<p:outputLabel value="Número do cartão:" style="font-weight: bold;"/>
-							</p:column>
-							<p:column>
-								<h:outputText value="#{vendaMB.cliente.cartaoPreferencial.numero}"/>
-							</p:column>
-						</p:row>
-						<p:row>
-							<p:column>
-								<p:outputLabel value="Bandeira:" style="font-weight: bold;"/>
-							</p:column>
-							<p:column>
-								<h:outputText value="#{vendaMB.cliente.cartaoPreferencial.bandeira.nome}"/>
-							</p:column>
-						</p:row>
-						<p:row>
-							<p:column>
-								<p:outputLabel value="Data de vencimento:" style="font-weight: bold;"/>
-							</p:column>
-							<p:column>
-								<h:outputText value="#{vendaMB.cliente.cartaoPreferencial.dtVencimento}"/>
-							</p:column>
-						</p:row>
-						<p:row>
-							<p:column>
-								<p:outputLabel value="Cód segurança:" style="font-weight: bold;"/>
-							</p:column>
-							<p:column>
-								<h:outputText value="#{vendaMB.cliente.cartaoPreferencial.codSeguranca}"/>
-							</p:column>
-						</p:row>
-					</p:panelGrid>
-					<p:spacer></p:spacer>
 					<p:panelGrid styleClass="ui-noborder">
 						<p:row>
 							<p:column>
-								<h:outputText value="Cupom de troca"/>
+								<p:commandButton value="Adicionar forma de pagamento" oncomplete="PF('dialogPgto').show()"/>
 							</p:column>
 						</p:row>
+						<p:row >
+							<p:column>
+								<ui:repeat var="cart" value="#{vendaMB.cartoesPtgo}">
+									<p:panelGrid>
+										<p:row>
+											<p:column>
+												<h1>Cartão</h1>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Nome impresso:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cart.formaPgto.cartao.nomeImpresso}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Número do cartão:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cart.formaPgto.cartao.numero}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Bandeira:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cart.formaPgto.cartao.bandeira.nome}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Data de vencimento:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cart.formaPgto.cartao.dtVencimento}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Cód segurança:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cart.formaPgto.cartao.codSeguranca}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Valor:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cart.valor}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:commandButton value="Remover" actionListener="#{vendaMB.removerCartaoPgto(cart)}" update="pedido:pgPedido"/>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+								</ui:repeat>
+							</p:column>
+						</p:row>
+						<p:spacer></p:spacer>
 						<p:row>
 							<p:column>
-								<h:outputText value="Código:" style="font-weight: bold;"/>
-							</p:column>
-							<p:column>
-								<p:inputText />
-							</p:column>
-							<p:column>
-								<p:commandButton value="Aplicar"/>
+								<ui:repeat var="cupom" value="#{vendaMB.cuponsTrocaPgto}">
+									<p:panelGrid styleClass="ui-noborder">
+										<p:row>
+											<p:column>
+												<h1>Cupom de troca</h1>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:outputText value="Código:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cupom.formaPgto.cupomTroca.codigo}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:outputText value="Valor:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{cupom.formaPgto.cupomTroca.valor}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:commandButton value="Remover" actionListener="#{vendaMB.removerCartaoPgto(cupom)}" update="pedido:pgPedido"/>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+								</ui:repeat>
 							</p:column>
 						</p:row>
 					</p:panelGrid>
+					
 				</p:column>
 			</p:row>
 			
@@ -218,15 +334,25 @@
 					<p:panelGrid id="total">
 						<p:row>
 							<p:column>
-								<h:outputText value="Frete:"/>
+								<h:outputText value="Valor total dos produtos:" style="font-weight: bold;"/>
 							</p:column>
 							<p:column>
-								<h:outputText>
+								<h:outputText value="#{vendaMB.pedido.valorTotal}">
 									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 						</p:row>
 						<p:row>
+							<p:column>
+								<h:outputText value="Frete:"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{vendaMB.pedido.custoFrete.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+						</p:row>
+						<p:row rendered="#{vendaMB.pedido.cupomPromocional != null}">
 							<p:column>
 								<h:outputText value="Desconto de cupom promocional:"/>
 							</p:column>
@@ -238,11 +364,11 @@
 						</p:row>
 						<p:row>
 							<p:column>
-								<h:outputText value="Valor final:"/>
+								<h:outputText value="Valor final com descontos:"/>
 							</p:column>
 							<p:column>
 								<h1>
-									<h:outputText value="#{vendaMB.pedido.valorTotal}" >
+									<h:outputText value="#{vendaMB.pedido.valorTotalComDescontos}" >
 										<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
 									</h:outputText>
 								</h1>
@@ -253,7 +379,7 @@
 			</p:row>
 			<p:row>
 				<p:column>
-					<p:commandButton value="Finalizar pedido"/>
+					<p:commandButton value="Finalizar pedido" actionListener="#{vendaMB.finalizarPedido}" update="growl"/>
 				</p:column>
 			</p:row>
 		</p:panelGrid>
@@ -261,10 +387,9 @@
 	
 	<p:dialog id="dlgEnd" header="Endereços de entrega" widgetVar="dialogEnderecos" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
 		<h:form id="formEnd">
-			<p:dataGrid var="end" value="#{vendaMB.cliente.endsEntrega}" columns="1" layout="grid"
-		        rows="12" paginator="true" id="end"
-		        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-		        rowsPerPageTemplate="6,12,16">
+			<p:dataGrid var="end" value="#{vendaMB.listEndEntrega}" columns="4" layout="grid"
+		        rows="3" paginator="true" id="end"
+		        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
 		        <p:panelGrid rendered="#{vendaMB.pedido.endEntrega != null}" styleClass="ui-noborder">
 					<p:row>
 						<p:column>
@@ -362,9 +487,258 @@
 						</p:column>
 					</p:row>
 				</p:panelGrid>
-		        
 		    </p:dataGrid>
 		</h:form>
 	</p:dialog>
+	
+	<p:dialog id="dlgAdcEnd" header="Novo endereço" widgetVar="dialogAdcEndereco" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+		<h:form id="formAdcEnd">
+			<h:panelGrid>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Título"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{vendaMB.novoEndereco.titulo}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de residência"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{vendaMB.novoEndereco.tipoResidencia}" placeholder="Casa, apartamento, etc"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Tipo de logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{vendaMB.novoEndereco.tipoLogradouro}" placeholder="Rua, Avenida, Praça, etc"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Logradouro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{vendaMB.novoEndereco.logradouro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Número"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{vendaMB.novoEndereco.numero}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Bairro"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputText value="#{vendaMB.novoEndereco.bairro}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="CEP"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:inputMask value="#{vendaMB.novoEndereco.cep}" mask="99999-999"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="País"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:selectOneMenu value="#{vendaMB.paisSelecionado.id}" required="true" >
+						<f:selectItem itemLabel="--SELECIONE--"/>
+						<f:selectItems value="#{vendaMB.paises}" var="pais" itemLabel="#{pais.nome}" itemValue="#{pais.id}"/>
+							<p:ajax listener="#{vendaMB.popularEstados}" update="formAdcEnd:dropDownEstados dropDownCidades"/>
+					</p:selectOneMenu>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Estado"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:selectOneMenu id="dropDownEstados" value="#{vendaMB.estadoSelecionado.id}">
+						<f:selectItem itemLabel="--SELECIONE--"/>
+						<f:selectItems value="#{vendaMB.estados}" var="est" itemLabel="#{est.nome}" itemValue="#{est.id}"/>
+							<p:ajax listener="#{vendaMB.popularCidades}" update="formAdcEnd:dropDownCidades"/>
+					</p:selectOneMenu>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Cidade"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:selectOneMenu id="dropDownCidades" value="#{vendaMB.cidadeSelecionada.id}">
+						<f:selectItem itemLabel="--SELECIONE--"/>
+						<f:selectItems value="#{vendaMB.cidades}" var="cid" itemLabel="#{cid.nome}" itemValue="#{cid.id}"/>
+					</p:selectOneMenu>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:outputLabel value="Observações"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:inputTextarea value="#{vendaMB.novoEndereco.observacoes}" rows="2"/>
+				</p:row>
+				<p:row>
+					<p:selectBooleanCheckbox value="#{vendaMB.flgSalvarEnd}" style="margin-right:10px;"/>
+					<h:outputText value="Salvar endereço no perfil"/>
+				</p:row>
+				<p:row>
+					<p:commandButton value="Salvar"	actionListener="#{vendaMB.adicionaNovoEndereco}" 
+					oncomplete="PF('dialogAdcEndereco').hide()" update="pedido:endEntrega"/>
+				</p:row>
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	
+	<p:dialog id="dlgPgto" header="Adicionar forma de pagamento" widgetVar="dialogPgto" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >	
+		<h:form id="formPgto">
+			<p:growl id="growl" showDetail="true" life="8000" />
+			<p:panelGrid id="pgFormaPgto">
+				<p:row>
+					<p:column>
+						<h:outputText value="Selecione a forma de pagamento:"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<p:selectOneMenu value="#{vendaMB.selFormaPgto}">
+							<f:selectItem itemLabel="--Selecione--"/>
+							<f:selectItem itemLabel="Cartão de crédito" itemValue="cartao"/>
+							<f:selectItem itemLabel="Cupom de troca" itemValue="cupom"/>
+							<p:ajax update="formPgto:pgFormaPgto"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row><p:column><p:spacer></p:spacer></p:column></p:row>
+				<p:row>
+					<p:column>
+						<p:panelGrid >
+							<p:row rendered="#{vendaMB.selFormaPgto == 'cartao'}">
+								<p:column>
+									<p:panelGrid>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Nome impresso:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{vendaMB.cartao.nomeImpresso}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Número do cartão:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{vendaMB.cartao.numero}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Bandeira:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{vendaMB.cartao.bandeira.nome}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Data de vencimento:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{vendaMB.cartao.dtVencimento}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="Cód segurança:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<h:outputText value="#{vendaMB.cartao.codSeguranca}"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:outputText value="Valor:" style="font-weight: bold;"/>
+											</p:column>
+											<p:column>
+												<p:inputText value="#{vendaMB.pagamento.valor}"/>
+											</p:column>
+										</p:row>
+										<p:row><p:column><p:spacer></p:spacer></p:column></p:row>
+										<p:row>
+											<p:column>
+												<h:outputText value="Pagar com outro cartão:"/>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:selectOneMenu value="#{vendaMB.cartaoSelecionado.id}">
+													<f:selectItem itemLabel="--Selecione--"/>
+													<f:selectItems value="#{vendaMB.cliente.cartoes}" var="cartao" itemLabel="#{cartao.numero}" itemValue="#{cartao.id}"/>
+													<p:ajax listener="#{vendaMB.carregarDadosCartao}" update="formPgto:pgFormaPgto"/>
+												</p:selectOneMenu>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+								</p:column>
+							</p:row>
+							<p:row rendered="#{vendaMB.selFormaPgto == 'cupom'}">
+								<p:column>
+									<p:panelGrid>
+										<p:row>
+											<p:column>
+												<h:outputText value="Insira o código do cupom:"/>
+											</p:column>
+											<p:column>
+												<p:inputText value="#{vendaMB.cupomTroca.codigo}"/>
+											</p:column>
+											<p:column>
+												<p:commandButton value="Verificar" actionListener="#{vendaMB.validarCupomTroca}" update="growl"/>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+								</p:column>
+							</p:row>
+							<p:row><p:column><p:spacer></p:spacer></p:column></p:row>
+							<p:row>
+								<p:column>
+									<p:commandButton value="Adicionar" actionListener="#{vendaMB.adicionarPagamento}" update="growl pedido:pgPedido"/>
+								</p:column>
+							</p:row>
+						</p:panelGrid>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</h:form>
+	</p:dialog>	
 </h:body>
 </html>

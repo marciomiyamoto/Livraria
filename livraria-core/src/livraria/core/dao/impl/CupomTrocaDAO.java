@@ -4,76 +4,71 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import dominio.EntidadeDominio;
-import dominio.endereco.Estado;
-import dominio.endereco.Pais;
-import dominio.livro.Registro;
+import dominio.venda.CupomPromocional;
+import dominio.venda.CupomTroca;
 
-public class RegistroDAO extends AbstractJdbcDAO {
-	
-	protected RegistroDAO(String tabela, String idTabela) {
-		super("Registro", "id");
+public class CupomTrocaDAO extends AbstractJdbcDAO {
+
+	protected CupomTrocaDAO(String tabela, String idTabela) {
+		super("CupomTroca", "id");
 	}
 	
-	public RegistroDAO(Connection conn) {
-		super(conn, "Registro", "id");
+	public CupomTrocaDAO(Connection conn) {
+		super(conn, "CupomTroca", "id");
 	}
 	
-	public RegistroDAO() {
-		super("Registro", "id");
+	public CupomTrocaDAO() {
+		super("CupomTroca", "id");
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
-		PreparedStatement pst = null;
-		Registro registro = (Registro)entidade;
-		StringBuilder sql = new StringBuilder();
-		
-		sql.append("INSERT INTO Registro ");
-		sql.append("(qtde, valorCompra, valorVenda, tipoRegistro, id_estoque) ");
-		sql.append("VALUES(?,?,?,?,?)");
-		
-		try {
-			connection.setAutoCommit(false);
-			
-			pst = connection.prepareStatement(sql.toString(), new String[] {"id"});
-			pst.setInt(1, registro.getQtde());
-			pst.setNull(2, Types.DOUBLE);
-			pst.setDouble(3, registro.getValorVenda());
-			pst.setInt(4, registro.getTipoRegistro());
-			pst.setInt(5, registro.getIdEstoque());
-			
-			pst.executeUpdate();
-			ResultSet generatedKeys = pst.getGeneratedKeys();
-			if(null != generatedKeys && generatedKeys.next()) {
-				registro.setId(generatedKeys.getInt(1));
-			}
-			connection.commit();
-			
-		} catch(SQLException e) {
-			try {
-				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
-			}
-		} finally {
-			if(ctrlTransacao) {
-				try {
-					pst.close();
-					if(ctrlTransacao) {
-						connection.close();
-					}
-				} catch(SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+//		if(connection == null) {
+//			abrirConexao();
+//		}
+//		PreparedStatement pst = null;
+//		Estado estado = (Estado)entidade;
+//		StringBuilder sql = new StringBuilder();
+//		
+//		sql.append("INSERT INTO Estado ");
+//		sql.append("(nome, id_pais) ");
+//		sql.append("VALUES(?, ?)");
+//		
+//		try {
+//			connection.setAutoCommit(false);
+//			
+//			pst = connection.prepareStatement(sql.toString(), new String[] {"id"});
+//			pst.setString(1, estado.getNome());
+//			pst.setInt(2, estado.getPais().getId());
+//			
+//			pst.executeUpdate();
+//			ResultSet generatedKeys = pst.getGeneratedKeys();
+//			if(null != generatedKeys && generatedKeys.next()) {
+//				estado.setId(generatedKeys.getInt(1));
+//			}
+//			
+//			connection.commit();
+//		} catch(SQLException e) {
+//			try {
+//				connection.rollback();
+//			} catch (SQLException el){
+//				el.printStackTrace();
+//			}
+//		} finally {
+//			if(ctrlTransacao) {
+//				try {
+//					pst.close();
+//					if(ctrlTransacao) {
+//						connection.close();
+//					}
+//				} catch(SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 	}
 
 	@Override
@@ -117,7 +112,7 @@ public class RegistroDAO extends AbstractJdbcDAO {
 //				}
 //			}
 //		}
-//		
+		
 	}
 
 	@Override
@@ -132,39 +127,45 @@ public class RegistroDAO extends AbstractJdbcDAO {
 			abrirConexao();
 		}
 		PreparedStatement pst = null;
-		Registro registro = (Registro)entidade;
+		CupomTroca cupom = (CupomTroca) entidade;
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM Registro ");
+		sql.append("SELECT * FROM CupomTroca ");
 		sql.append("WHERE 1=1 ");
 		
-		if(registro.getIdEstoque() != null && registro.getIdEstoque() != 0) {
-			sql.append("AND id_estoque = ?");
+		if(cupom.getId() != null && cupom.getId() != 0) {
+			sql.append("AND id = ?");
+		}
+		if(cupom.getCodigo() != null && !cupom.getCodigo().equals("")) {
+			sql.append("AND codigo = ?");
 		}
 		
 		try {
 			pst = connection.prepareStatement(sql.toString());		
 			int i = 1;
 			
-			if(registro.getIdEstoque() != null && registro.getIdEstoque() != 0) {
-				pst.setInt(i, registro.getIdEstoque());
+			if(cupom.getId() != null && cupom.getId() != 0) {
+				pst.setInt(i, cupom.getId());
+				i++;
+			}
+			if(cupom.getCodigo() != null && !cupom.getCodigo().equals("")) {
+				pst.setString(i, cupom.getCodigo());
 				i++;
 			}
 			
 			ResultSet rs = pst.executeQuery();
-			List<EntidadeDominio> registros = new ArrayList<EntidadeDominio>()	;
+			List<EntidadeDominio> cupons = new ArrayList<EntidadeDominio>()	;
 			while(rs.next() ) {
-				registro = new Registro();
-				registro.setId(rs.getInt("id"));
-				registro.setDtCadastro(rs.getDate("dtcadastro"));
-				registro.setIdEstoque(rs.getInt("id_estoque"));
-				registro.setQtde(rs.getInt("qtde"));
-				registro.setValorCompra(rs.getDouble("valorCompra"));
-				registro.setValorVenda(rs.getDouble("valorVenda"));
-				registro.setTipoRegistro(rs.getInt("tipoRegistro"));
-				registros.add(registro);
+				CupomTroca cupomTemp = new CupomTroca();
+				cupomTemp.setId(rs.getInt("id"));
+				cupomTemp.setDtCadastro(rs.getDate("dtcadastro"));
+				cupomTemp.setAtivo(rs.getBoolean("ativo"));
+				cupomTemp.setCodigo(rs.getString("codigo"));
+				cupomTemp.setValor(rs.getDouble("valor"));
+				cupomTemp.setIdCliente(rs.getInt("id_cliente"));
+				cupons.add(cupomTemp);
 			}
 			rs.close();
-			return registros;
+			return cupons;
 		} catch (SQLException ex) {
 			System.out.println("\n--- SQLException ---\n");
 			while( ex != null ) {

@@ -9,6 +9,7 @@ import dominio.endereco.Endereco;
 public class Pedido extends EntidadeDominio {
 
 	private Double valorTotal;
+	private Double valorTotalComDescontos;
 	private Cliente cliente;
 	private CustoFrete custoFrete;
 	private Integer statusPedido;
@@ -65,6 +66,12 @@ public class Pedido extends EntidadeDominio {
 	public void setCupomPromocional(CupomPromocional cupomPromocional) {
 		this.cupomPromocional = cupomPromocional;
 	}
+	public Double getValorTotalComDescontos() {
+		return valorTotalComDescontos;
+	}
+	public void setValorTotalComDescontos(Double valorTotalComDescontos) {
+		this.valorTotalComDescontos = valorTotalComDescontos;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -77,6 +84,7 @@ public class Pedido extends EntidadeDominio {
 		result = prime * result + ((pagamentos == null) ? 0 : pagamentos.hashCode());
 		result = prime * result + ((statusPedido == null) ? 0 : statusPedido.hashCode());
 		result = prime * result + ((valorTotal == null) ? 0 : valorTotal.hashCode());
+		result = prime * result + ((valorTotalComDescontos == null) ? 0 : valorTotalComDescontos.hashCode());
 		return result;
 	}
 	@Override
@@ -128,13 +136,19 @@ public class Pedido extends EntidadeDominio {
 				return false;
 		} else if (!valorTotal.equals(other.valorTotal))
 			return false;
+		if (valorTotalComDescontos == null) {
+			if (other.valorTotalComDescontos != null)
+				return false;
+		} else if (!valorTotalComDescontos.equals(other.valorTotalComDescontos))
+			return false;
 		return true;
 	}
 	@Override
 	public String toString() {
-		return "Pedido [valorTotal=" + valorTotal + ", cliente=" + cliente + ", custoFrete=" + custoFrete
-				+ ", statusPedido=" + statusPedido + ", pagamentos=" + pagamentos + ", itens=" + itens + ", endEntrega="
-				+ endEntrega + ", cupomPromocional=" + cupomPromocional + "]";
+		return "Pedido [valorTotal=" + valorTotal + ", valorTotalComDescontos=" + valorTotalComDescontos + ", cliente="
+				+ cliente + ", custoFrete=" + custoFrete + ", statusPedido=" + statusPedido + ", pagamentos="
+				+ pagamentos + ", itens=" + itens + ", endEntrega=" + endEntrega + ", cupomPromocional="
+				+ cupomPromocional + "]";
 	}
 	
 }

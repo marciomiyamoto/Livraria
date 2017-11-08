@@ -35,12 +35,49 @@
 					<h:outputText value="CEP:"/>
 				</p:column>
 				<p:column>
-					<p:inputText/>
+					<p:inputText value="#{vendaMB.cepDestino}"/>
 				</p:column>
 			</p:row>
 			<p:row>
 				<p:column>
-					<p:commandButton value="Calcular frete"/>
+					<p:commandButton value="Calcular frete" actionListener="#{vendaMB.calcularFrete}" update="carrinho:valor"/>
+				</p:column>
+				<p:column >
+					<p:panelGrid>
+						<p:row>
+							<p:column>
+								<h:outputText value="PAC: R$#{vendaMB.custoFretePAC.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel rendered="#{vendaMB.custoFretePAC.erro == '0'}" value="Prazo de entrega: #{vendaMB.custoFretePAC.prazoEntrega} dias úteis" />
+								<p:outputLabel rendered="#{vendaMB.custoFretePAC.erro != '0'}" value="Indisponível" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Sedex: #{vendaMB.custoFreteSedex.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex.erro == '0'}" value="Prazo de entrega: #{vendaMB.custoFreteSedex.prazoEntrega} dias úteis" />
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex.erro != '0'}" value="Indisponível" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputText value="Sedex10: #{vendaMB.custoFreteSedex10.valor}">
+									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+								</h:outputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex10.erro == '0'}" value="Prazo de entrega: #{vendaMB.custoFreteSedex10.prazoEntrega} dias úteis" />
+								<p:outputLabel rendered="#{vendaMB.custoFreteSedex10.erro != '0'}" value="Indisponível" />
+							</p:column>
+						</p:row>
+					</p:panelGrid>
 				</p:column>
 			</p:row>
 			<p:row>
@@ -66,7 +103,7 @@
 			<p:row>
 				<p:column>
 					<p:commandButton 
-						value="Finalizar compra" 
+						value="Fechar compra" 
 						actionListener="#{vendaMB.carregarClienteSelecionado}"
 						action="pedido.xhtml?faces-redirect=true" 
 						ajax="false"/>

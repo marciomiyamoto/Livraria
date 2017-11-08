@@ -9,7 +9,7 @@ public class Frete extends EntidadeDominio {
 	private Integer qtde;
 	private String cepOrigem;
 	private String cepDestino;
-	private Integer tipoEnvio;
+	private String tipoEnvio;
 	
 	public Livro getLivro() {
 		return livro;
@@ -35,10 +35,10 @@ public class Frete extends EntidadeDominio {
 	public void setCepDestino(String cepDestino) {
 		this.cepDestino = cepDestino;
 	}
-	public Integer getTipoEnvio() {
+	public String getTipoEnvio() {
 		return tipoEnvio;
 	}
-	public void setTipoEnvio(Integer tipoEnvio) {
+	public void setTipoEnvio(String tipoEnvio) {
 		this.tipoEnvio = tipoEnvio;
 	}
 	@Override

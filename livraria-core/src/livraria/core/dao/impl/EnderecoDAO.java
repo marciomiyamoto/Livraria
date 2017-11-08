@@ -26,7 +26,7 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
+		if(connection == null) {
 			abrirConexao();
 		}
 		PreparedStatement pst = null;
@@ -70,8 +70,8 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				endereco.setId(generatedKeys.getInt(1));
 			}
-			
 			connection.commit();
+			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();

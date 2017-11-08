@@ -27,7 +27,7 @@ public class CartaoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
+		if(connection == null) {
 			abrirConexao();
 		}
 		PreparedStatement pst = null;
@@ -59,8 +59,8 @@ public class CartaoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				cartao.setId(generatedKeys.getInt(1));
 			}
-			
 			connection.commit();
+			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
@@ -145,7 +145,7 @@ public class CartaoDAO extends AbstractJdbcDAO {
 		PreparedStatement pst = null;
 		Cartao cartao = (Cartao)entidade;
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT c.id, c.dtCadastro, c.numero, c.nomeimpresso, c.codseguranca, c.dtVencimento, ");
+		sql.append("SELECT c.id, c.dtCadastro, c.numero, c.nomeimpresso, c.codseguranca, c.dtVencimento, c.id_cliente as id_cliente, ");
 		sql.append("b.id AS b_id, b.dtCadastro AS b_dtCadastro, b.bin AS bin, b.nome AS bandeira ");
 		sql.append("FROM cartao c ");
 		sql.append("JOIN BANDEIRACARTAO b ON b.id = c.ID_BANDEIRA ");
@@ -172,6 +172,7 @@ public class CartaoDAO extends AbstractJdbcDAO {
 				cartao.setCodSeguranca(rs.getInt("codSeguranca"));
 				cartao.setDtVencimento(rs.getDate("dtVencimento"));
 				cartao.setBandeira(bandeira);
+				cartao.setIdCliente(rs.getInt("id_cliente"));
 				
 				cartoes.add(cartao);
 			}

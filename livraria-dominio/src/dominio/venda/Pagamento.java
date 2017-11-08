@@ -7,6 +7,7 @@ public class Pagamento extends EntidadeDominio {
 	private double valor;
 	private Integer status;
 	private FormaPgto formaPgto;
+	private Integer idPedido;
 	
 	public double getValor() {
 		return valor;
@@ -26,11 +27,18 @@ public class Pagamento extends EntidadeDominio {
 	public void setFormaPgto(FormaPgto formaPgto) {
 		this.formaPgto = formaPgto;
 	}
+	public Integer getIdPedido() {
+		return idPedido;
+	}
+	public void setIdPedido(Integer idPedido) {
+		this.idPedido = idPedido;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((formaPgto == null) ? 0 : formaPgto.hashCode());
+		result = prime * result + ((idPedido == null) ? 0 : idPedido.hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		long temp;
 		temp = Double.doubleToLongBits(valor);
@@ -51,6 +59,11 @@ public class Pagamento extends EntidadeDominio {
 				return false;
 		} else if (!formaPgto.equals(other.formaPgto))
 			return false;
+		if (idPedido == null) {
+			if (other.idPedido != null)
+				return false;
+		} else if (!idPedido.equals(other.idPedido))
+			return false;
 		if (status == null) {
 			if (other.status != null)
 				return false;
@@ -62,7 +75,8 @@ public class Pagamento extends EntidadeDominio {
 	}
 	@Override
 	public String toString() {
-		return "Pagamento [valor=" + valor + ", status=" + status + ", formaPgto=" + formaPgto + "]";
+		return "Pagamento [valor=" + valor + ", status=" + status + ", formaPgto=" + formaPgto + ", idPedido="
+				+ idPedido + "]";
 	}
 	
 }

@@ -26,7 +26,7 @@ public class GeneroDAO extends AbstractJdbcDAO{
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null) {
+		if(connection == null || connection.isClosed()) {
 			abrirConexao();
 		}
 		PreparedStatement pst = null;
@@ -49,7 +49,6 @@ public class GeneroDAO extends AbstractJdbcDAO{
 				genero.setId(generatedKeys.getInt(1));
 			}
 			
-			connection.commit();
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
@@ -61,6 +60,7 @@ public class GeneroDAO extends AbstractJdbcDAO{
 				try {
 					pst.close();
 					if(ctrlTransacao) {
+						connection.commit();
 						connection.close();
 					}
 				} catch(SQLException e) {
