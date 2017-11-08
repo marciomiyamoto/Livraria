@@ -527,7 +527,7 @@ public class VendaMB {
 		
 		for(Pagamento p : pagamentos) {
 			if(p.getFormaPgto().getCartao() != null && pgto.getFormaPgto().getCartao() != null) {
-				if(p.getFormaPgto().getCartao().getId().equals(pgto.getFormaPgto().getCartao().getId())) {
+				if(p.getFormaPgto().getCartao().equals(pgto.getFormaPgto().getCartao())) {
 					pgtosTemp.add(p);
 				}
 			} else if(p.getFormaPgto().getCupomTroca() != null && pgto.getFormaPgto().getCupomTroca() != null) {
@@ -536,7 +536,7 @@ public class VendaMB {
 				}
 			}
 			if(pgto.getFormaPgto().getCartao() != null && pgto.getFormaPgto().getCupomTroca() == null && p.getFormaPgto().getCartao() != null &&
-					pgto.getFormaPgto().getCartao().getId().equals(p.getFormaPgto().getCartao().getId())) {
+					pgto.getFormaPgto().getCartao().equals(p.getFormaPgto().getCartao())) {
 				cartoesTemp.add(p);
 			}
 			if(pgto.getFormaPgto().getCartao() == null && pgto.getFormaPgto().getCupomTroca() != null && p.getFormaPgto().getCupomTroca() != null &&
