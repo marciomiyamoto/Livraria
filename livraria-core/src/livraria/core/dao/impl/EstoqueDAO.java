@@ -34,49 +34,48 @@ public class EstoqueDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-//		if(connection == null) {
-//			abrirConexao();
-//		}
-//		PreparedStatement pst = null;
-//		Estado estado = (Estado)entidade;
-//		StringBuilder sql = new StringBuilder();
-//		
-//		sql.append("INSERT INTO Estado ");
-//		sql.append("(nome, id_pais) ");
-//		sql.append("VALUES(?, ?)");
-//		
-//		try {
-//			connection.setAutoCommit(false);
-//			
-//			pst = connection.prepareStatement(sql.toString(), new String[] {"id"});
-//			pst.setString(1, estado.getNome());
-//			pst.setInt(2, estado.getPais().getId());
-//			
-//			pst.executeUpdate();
-//			ResultSet generatedKeys = pst.getGeneratedKeys();
-//			if(null != generatedKeys && generatedKeys.next()) {
-//				estado.setId(generatedKeys.getInt(1));
-//			}
-//			
-//			connection.commit();
-//		} catch(SQLException e) {
-//			try {
-//				connection.rollback();
-//			} catch (SQLException el){
-//				el.printStackTrace();
-//			}
-//		} finally {
-//			if(ctrlTransacao) {
-//				try {
-//					pst.close();
-//					if(ctrlTransacao) {
-//						connection.close();
-//					}
-//				} catch(SQLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
+		if(connection == null || connection.isClosed()) {
+			abrirConexao();
+		}
+		PreparedStatement pst = null;
+		Estoque estoque = (Estoque)entidade;
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("INSERT INTO Estoque ");
+		sql.append("(id_livro) ");
+		sql.append("VALUES(?)");
+		
+		try {
+			connection.setAutoCommit(false);
+			
+			pst = connection.prepareStatement(sql.toString(), new String[] {"id"});
+			pst.setInt(1, estoque.getLivro().getId());
+			
+			pst.executeUpdate();
+			ResultSet generatedKeys = pst.getGeneratedKeys();
+			if(null != generatedKeys && generatedKeys.next()) {
+				estoque.setId(generatedKeys.getInt(1));
+			}
+			
+			connection.commit();
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException el){
+				el.printStackTrace();
+			}
+		} finally {
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override

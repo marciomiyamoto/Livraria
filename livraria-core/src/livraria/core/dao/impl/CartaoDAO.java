@@ -27,7 +27,7 @@ public class CartaoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null) {
+		if(connection == null || connection.isClosed()) {
 			abrirConexao();
 		}
 		PreparedStatement pst = null;

@@ -9,6 +9,7 @@
 <h:head></h:head>
 <h:body>
 	<h:form>
+		<p:commandButton value="Buscar" actionListener="#{adminMB.carregarPedidos}" update="dtPedidos"/>
 		<p:dataTable id="dtPedidos" var="pedido" value="#{adminMB.pedidos}">
 			<p:column headerText="ID">
 				<h:outputText value="#{pedido.id}"/>

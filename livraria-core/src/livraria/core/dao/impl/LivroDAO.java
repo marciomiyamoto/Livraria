@@ -12,6 +12,7 @@ import dominio.livro.Autor;
 import dominio.livro.Categoria;
 import dominio.livro.Dimensoes;
 import dominio.livro.Editora;
+import dominio.livro.Estoque;
 import dominio.livro.GrupoDePrecificacao;
 import dominio.livro.Livro;
 import dominio.livro.Subcategoria;
@@ -40,6 +41,8 @@ public class LivroDAO extends AbstractJdbcDAO {
 		AutorDAO autDAO = new AutorDAO();
 		Dimensoes dimensoes = livro.getDimensoes();
 		DimensoesDAO dimDAO = new DimensoesDAO();
+		EstoqueDAO estDao = new EstoqueDAO();
+		Estoque estoque = new Estoque();
 		StringBuilder sql = new StringBuilder();
 		
 		// SALVANDO DIMENSOES
@@ -102,6 +105,11 @@ public class LivroDAO extends AbstractJdbcDAO {
 			for(Subcategoria subcat : livro.getSubcategorias()) {
 				salvarSubcategoria(livro, subcat);
 			}
+			// SALVANDO ESTOQUE
+			estoque.setLivro(livro);
+			estDao.salvar(estoque);
+			
+			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();

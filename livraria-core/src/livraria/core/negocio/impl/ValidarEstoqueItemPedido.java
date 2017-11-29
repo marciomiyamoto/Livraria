@@ -25,7 +25,7 @@ public class ValidarEstoqueItemPedido implements IStrategy {
 				calcEst.processar(estoqueTemp);
 				// CASO A QTDE EM ESTOQUE SEJA MAIOR OU IGUAL A QTDE ADICIONADA NO CARRINHO, RETORNA DISPONIVEL
 				// CASO CONTRÁRIO, RETORNA INDISPONIVEL
-				if(estoqueTemp.getQtdeTotal() >= item.getQtde()) {
+				if(estoqueTemp.getQtdeTotal() != null && estoqueTemp.getQtdeTotal() >= item.getQtde()) {
 					return "Disponivel";
 				} else {
 					return "Indisponivel";

@@ -30,10 +30,11 @@
 					</p:row>
 					<p:row>
 						<p:column>
-							<h:inputSecret value="#{clienteMB.cliente.senha}" 
+							<p:password value="#{clienteMB.cliente.senha}"/>
+							<!-- <h:inputSecret value="#{clienteMB.cliente.senha}" 
 							validatorMessage="Senha inválida! A senha cadastrada pelo usuário deve ser composta de pelo menos 8 caracteres, ter letras maiúsculas e minúsculas além de conter caracteres especiais.">
 								<f:validateRegex pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^+=])(?=\\S+$).{8,}" />
-							</h:inputSecret>
+							</h:inputSecret> -->
 						</p:column>
 					</p:row>
 					<p:row>
