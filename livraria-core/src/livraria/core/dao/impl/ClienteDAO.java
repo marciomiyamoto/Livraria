@@ -337,7 +337,7 @@ public class ClienteDAO extends AbstractJdbcDAO {
 		if(cli.getAtivo() != null) {
 			sql.append("AND ativo = ? ");
 		}
-		if(cli.getGenero().getId() != null && cli.getGenero().getId() != 0) {
+		if(cli.getGenero() != null && cli.getGenero().getId() != null && cli.getGenero().getId() != 0) {
 			sql.append("AND g.id = ?");
 		}
 		
@@ -369,7 +369,7 @@ public class ClienteDAO extends AbstractJdbcDAO {
 				pst.setBoolean(i, cli.getAtivo());
 				i++;
 			}
-			if(cli.getGenero().getId() != null && cli.getGenero().getId() != 0) {
+			if(cli.getGenero() != null && cli.getGenero().getId() != null && cli.getGenero().getId() != 0) {
 				pst.setInt(i, cli.getGenero().getId());
 				i++;
 			}

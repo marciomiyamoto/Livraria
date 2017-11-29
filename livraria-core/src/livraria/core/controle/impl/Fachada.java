@@ -32,6 +32,8 @@ import dominio.livro.Registro;
 import dominio.livro.Subcategoria;
 import dominio.venda.CupomPromocional;
 import dominio.venda.CupomTroca;
+import dominio.venda.ItemBloqueioPedido;
+import dominio.venda.ItemPedido;
 import dominio.venda.Pedido;
 import livraria.core.IDAO;
 import livraria.core.IFachada;
@@ -53,6 +55,8 @@ import livraria.core.dao.impl.EstadoDAO;
 import livraria.core.dao.impl.EstoqueDAO;
 import livraria.core.dao.impl.GeneroDAO;
 import livraria.core.dao.impl.GrupoDePrecificacaoDAO;
+import livraria.core.dao.impl.ItemBloqueioPedidoDAO;
+import livraria.core.dao.impl.ItemPedidoDAO;
 import livraria.core.dao.impl.LivroDAO;
 import livraria.core.dao.impl.LogLivroDAO;
 import livraria.core.dao.impl.PaisDAO;
@@ -65,8 +69,17 @@ import livraria.core.dao.impl.TipoTelefoneDAO;
 import livraria.core.dao.impl.UsuarioDAO;
 import livraria.core.negocio.impl.AssociarMotivoAtivacao;
 import livraria.core.negocio.impl.AssociarMotivoInativacao;
+import livraria.core.negocio.impl.ValidarAtualizacaoStatusPedido;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosConfigLivro;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosLivro;
+import livraria.core.negocio.impl.ValidarDadosObrigatoriosPedido;
+import livraria.core.negocio.impl.ValidarEstoqueItemPedido;
+import livraria.core.negocio.impl.ValidarFrete;
+import livraria.core.negocio.impl.ValidarEstoqueItensFinalizacaoPedido;
+import livraria.core.negocio.impl.ValidarPagamentosCupomTroca;
+import livraria.core.negocio.impl.ValidarPagamentosPedido;
+import livraria.core.negocio.impl.ValidarValorMinMaxCartaoCredito;
+import livraria.core.negocio.impl.ValidarValorTotalPagamentos;
 
 public class Fachada implements IFachada {
 	
@@ -118,6 +131,8 @@ public class Fachada implements IFachada {
 		CupomPromocionalDAO cupPromDAO = new CupomPromocionalDAO();
 		CupomTrocaDAO cupTrocaDAO = new CupomTrocaDAO();
 		PedidoDAO pedidoDAO = new PedidoDAO();
+		ItemBloqueioPedidoDAO itemBloqPedDAO = new ItemBloqueioPedidoDAO();
+		ItemPedidoDAO itemPedDao = new ItemPedidoDAO();
 		
 		/* Adicionando cada dao no MAP indexando pelo nome da classe */
 //		daos.put(Bebida.class.getName(), bebidaDAO);
@@ -147,14 +162,25 @@ public class Fachada implements IFachada {
 		daos.put(CupomPromocional.class.getName(), cupPromDAO);
 		daos.put(CupomTroca.class.getName(), cupTrocaDAO);
 		daos.put(Pedido.class.getName(), pedidoDAO);
+		daos.put(ItemBloqueioPedido.class.getName(), itemBloqPedDAO);
+		daos.put(ItemPedido.class.getName(), itemPedDao);
 		
 		/* Criando instâncias de regras de negócio a serem utilizados*/		
 		ValidarDadosObrigatoriosLivro vDadosObrigatoriosLivro = new ValidarDadosObrigatoriosLivro();
 		AssociarMotivoAtivacao associarMotivoAtivacao = new AssociarMotivoAtivacao();
 		AssociarMotivoInativacao associarMotivoInativacao = new AssociarMotivoInativacao();
 		ValidarDadosObrigatoriosConfigLivro vDadosObrigatoriosConfigLivro = new ValidarDadosObrigatoriosConfigLivro();
-//		ValidarDadosObrigatoriosEstoque vDadosObrigatoriosEstoque = new ValidarDadosObrigatoriosEstoque();
+		ValidarEstoqueItemPedido vEstoqueItemPedido = new ValidarEstoqueItemPedido();
+		ValidarEstoqueItensFinalizacaoPedido vItensFinalPed = new ValidarEstoqueItensFinalizacaoPedido();
+		ValidarPagamentosCupomTroca vPagCupTroca = new ValidarPagamentosCupomTroca();
+		ValidarValorMinMaxCartaoCredito vValorMinCartCred = new ValidarValorMinMaxCartaoCredito();
+		ValidarValorTotalPagamentos vValorTotalPgtos = new ValidarValorTotalPagamentos();
+		ValidarFrete vFrete = new ValidarFrete();
+		ValidarDadosObrigatoriosPedido vDadosObrigPedido = new ValidarDadosObrigatoriosPedido();
+		ValidarPagamentosPedido vPagPedidos = new ValidarPagamentosPedido();
+		ValidarAtualizacaoStatusPedido vAtualStatPedido = new ValidarAtualizacaoStatusPedido();
 		
+// LIVRO
 		/* Criando uma lista para conter as regras de negócio de livro
 		 * quando a operação for salvar
 		 */
@@ -191,6 +217,52 @@ public class Fachada implements IFachada {
 		 * pelo nome da entidade
 		 */
 		rns.put(Livro.class.getName(), rnsLivro);
+		
+// ITEMPEDIDO
+		/* Criando uma lista para conter as regras de negócio de ItemPedido
+		 * quando a operação for consultar
+		 */
+		List<IStrategy> rnsConsultarItemPedido = new ArrayList<IStrategy>();
+		rnsConsultarItemPedido.add(vEstoqueItemPedido);
+		
+		/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+		 * por operação  do ItemPedido
+		 */
+		Map<String, List<IStrategy>> rnsItemPed = new HashMap<String, List<IStrategy>>();
+		rnsItemPed.put("CONSULTAR", rnsConsultarItemPedido);
+		
+		rns.put(ItemPedido.class.getName(), rnsItemPed);
+		
+// PEDIDO
+		// SALVAR
+		/* Criando uma lista para conter as regras de negócio de Pedido
+		 * quando a operação for salvar
+		 */
+		List<IStrategy> rnsSalvarPedido = new ArrayList<IStrategy>();
+		rnsSalvarPedido.add(vDadosObrigPedido);
+		rnsSalvarPedido.add(vFrete);
+		rnsSalvarPedido.add(vItensFinalPed);
+		rnsSalvarPedido.add(vPagCupTroca);
+		rnsSalvarPedido.add(vValorMinCartCred);
+		rnsSalvarPedido.add(vValorTotalPgtos);
+		
+		/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+		 * por operação  do ItemPedido
+		 */
+		Map<String, List<IStrategy>> rnsPedido = new HashMap<String, List<IStrategy>>();
+		rnsPedido.put("SALVAR", rnsSalvarPedido);
+		
+		// ALTERAR
+		/* Criando uma lista para conter as regras de negócio de Pedido
+		 * quando a operação for ALTERAR
+		 */
+		List<IStrategy> rnsAtualizarPedido = new ArrayList<IStrategy>();
+		rnsAtualizarPedido.add(vAtualStatPedido);
+		rnsAtualizarPedido.add(vPagPedidos);
+		
+		rnsPedido.put("ALTERAR", rnsAtualizarPedido);
+		
+		rns.put(Pedido.class.getName(), rnsPedido);
 	}
 	
 	

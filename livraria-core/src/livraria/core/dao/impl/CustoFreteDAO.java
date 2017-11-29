@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dominio.EntidadeDominio;
-import dominio.Genero;
 import dominio.venda.CustoFrete;
+import dominio.venda.Frete;
 
 public class CustoFreteDAO extends AbstractJdbcDAO {
 
@@ -124,44 +124,66 @@ public class CustoFreteDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-//		if(connection == null || connection.isClosed()) {
-//			abrirConexao();
-//		}
-//		PreparedStatement pst = null;
-//		StringBuilder sql = new StringBuilder();
-//		sql.append("SELECT * FROM Genero");
-//		
-//		try {
-//			pst = connection.prepareStatement(sql.toString());			
-//			ResultSet rs = pst.executeQuery();
-//			List<EntidadeDominio> generos = new ArrayList<EntidadeDominio>()	;
-//			while(rs.next() ) {
-//				Genero genero = new Genero();
-//				genero.setId(rs.getInt("id"));
-//				genero.setDtCadastro(rs.getDate("dtCadastro"));
-//				genero.setNome(rs.getString("nome"));
-//				generos.add(genero);
-//			}
-//			rs.close();
-//			return generos;
-//		} catch (SQLException ex) {
-//			System.out.println("\n--- SQLException ---\n");
-//			while( ex != null ) {
-//				System.out.println("Mensagem: " + ex.getMessage());
-//				System.out.println("SQLState: " + ex.getSQLState());
-//				System.out.println("ErrorCode: " + ex.getErrorCode());
-//				ex = ex.getNextException();
-//				System.out.println("");
-//			}
-//		} finally {
-//			try {
-//				pst.close();
-//				if(ctrlTransacao)
-//					connection.close();
-//			} catch(SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		if(connection == null || connection.isClosed()) {
+			abrirConexao();
+		}
+		CustoFrete custoFrete = (CustoFrete)entidade;
+		PreparedStatement pst = null;
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM Frete ");
+		sql.append("WHERE 1=1 ");
+		
+		if(custoFrete.getId() != null && custoFrete.getId() != 0) {
+			sql.append("AND id = ?");
+		}
+		
+		try {
+			pst = connection.prepareStatement(sql.toString());		
+			int i = 1;
+			
+			if(custoFrete.getId() != null && custoFrete.getId() != 0) {
+				pst.setInt(i, custoFrete.getId());
+				i++;
+			}
+			
+			ResultSet rs = pst.executeQuery();
+			List<EntidadeDominio> custoFretes = new ArrayList<EntidadeDominio>()	;
+			while(rs.next() ) {
+				custoFrete = new CustoFrete();
+				Frete frete = new Frete();
+				
+				frete.setCepDestino(rs.getString("cepDestino"));
+				frete.setCepOrigem(rs.getString("cepOrigem"));
+				frete.setTipoEnvio(rs.getString("tipoEntrega"));
+				
+				custoFrete.setId(rs.getInt("id"));
+				custoFrete.setDtCadastro(rs.getDate("dtCadastro"));
+				custoFrete.setValor(rs.getDouble("valor"));
+				custoFrete.setPrazoEntrega(rs.getInt("prazoEntrega"));
+				custoFrete.setFrete(frete);
+				
+				custoFretes.add(custoFrete);
+			}
+			rs.close();
+			return custoFretes;
+		} catch (SQLException ex) {
+			System.out.println("\n--- SQLException ---\n");
+			while( ex != null ) {
+				System.out.println("Mensagem: " + ex.getMessage());
+				System.out.println("SQLState: " + ex.getSQLState());
+				System.out.println("ErrorCode: " + ex.getErrorCode());
+				ex = ex.getNextException();
+				System.out.println("");
+			}
+		} finally {
+			try {
+				pst.close();
+				if(ctrlTransacao)
+					connection.close();
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return null;
 	}
 }

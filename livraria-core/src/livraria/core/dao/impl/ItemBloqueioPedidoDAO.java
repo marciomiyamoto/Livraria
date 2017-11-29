@@ -4,25 +4,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import dominio.EntidadeDominio;
-import dominio.livro.Estoque;
-import dominio.venda.ItemPedido;
+import dominio.endereco.Estado;
+import dominio.endereco.Pais;
+import dominio.venda.ItemBloqueioPedido;
 
-public class ItemPedidoDAO extends AbstractJdbcDAO {
-	
-	protected ItemPedidoDAO(String tabela, String idTabela) {
-		super("ItemPedido", "id");
+public class ItemBloqueioPedidoDAO extends AbstractJdbcDAO {
+
+	protected ItemBloqueioPedidoDAO(String tabela, String idTabela) {
+		super("ItemBloqueioPedido", "id");
 	}
 	
-	public ItemPedidoDAO(Connection conn) {
-		super(conn, "ItemPedido", "id");
+	public ItemBloqueioPedidoDAO(Connection conn) {
+		super(conn, "ItemBloqueioPedido", "id");
 	}
 	
-	public ItemPedidoDAO() {
-		super("ItemPedido", "id");
+	public ItemBloqueioPedidoDAO() {
+		super("ItemBloqueioPedido", "id");
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
@@ -30,29 +32,28 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 			abrirConexao();
 		}
 		PreparedStatement pst = null;
-		ItemPedido item = (ItemPedido)entidade;
+		ItemBloqueioPedido item = (ItemBloqueioPedido)entidade;
 		StringBuilder sql = new StringBuilder();
 		
-		sql.append("INSERT INTO ItemPedido ");
-		sql.append("(qtde, valorUnitario, id_pedido, id_estoque) ");
-		sql.append("VALUES(?,?,?,?)");
+		sql.append("INSERT INTO ItemBloqueioPedido ");
+		sql.append("(hora, qtde, id_estoque) ");
+		sql.append("VALUES(?, ?, ?)");
 		
 		try {
 			connection.setAutoCommit(false);
 			
 			pst = connection.prepareStatement(sql.toString(), new String[] {"id"});
-			pst.setInt(1, item.getQtde());
-			pst.setDouble(2, item.getValorUnitario());
-			pst.setInt(3, item.getIdPedido());
-			pst.setInt(4, item.getEstoque().getId());
+			pst.setTime(1, item.getHora());
+			pst.setInt(2, item.getQtde());
+			pst.setInt(3, item.getIdEstoque());
 			
 			pst.executeUpdate();
 			ResultSet generatedKeys = pst.getGeneratedKeys();
 			if(null != generatedKeys && generatedKeys.next()) {
 				item.setId(generatedKeys.getInt(1));
 			}
-			connection.commit();
 			
+			connection.commit();
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
@@ -75,44 +76,53 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-//		if(connection == null) {
-//			abrirConexao();
-//		}
-//		PreparedStatement pst = null;
-//		Genero genero = (Genero)entidade;
-//		StringBuilder sql = new StringBuilder();
-//		
-//		sql.append("UPDATE Genero SET ");
-//		sql.append("nome = ? ");
-//		sql.append("WHERE id = ?");
-//		try {
-//			connection.setAutoCommit(false);
-//			
-//			pst = connection.prepareStatement(sql.toString());
-//			pst.setString(1, genero.getNome());
-//			pst.setInt(2, genero.getId());
-//			
-//			pst.executeUpdate();
-//			connection.commit();
-//		} catch(SQLException e) {
-//			try {
-//				connection.rollback();
-//			} catch(SQLException e1) {
-//				e1.printStackTrace();
-//			}
-//			e.printStackTrace();
-//		} finally {
-//			if(ctrlTransacao) {
-//				try {
-//					pst.close();
-//					if(ctrlTransacao)
-//						connection.close();
-//				} catch(SQLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		
+		if(connection == null || connection.isClosed()) {
+			abrirConexao();
+		}
+		PreparedStatement pst = null;
+		ItemBloqueioPedido item = (ItemBloqueioPedido)entidade;
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("UPDATE ItemBloqueioPedido SET ");
+		sql.append("hora = ?, ");
+		sql.append("qtde = ?, ");
+		sql.append("id_estoque = ?, ");
+		sql.append("id_pedido = ? ");
+		sql.append("WHERE id = ?");
+		try {
+			connection.setAutoCommit(false);
+			
+			pst = connection.prepareStatement(sql.toString());
+			pst.setTime(1, item.getHora());
+			pst.setInt(2, item.getQtde());
+			pst.setInt(3, item.getIdEstoque());
+			if(item.getIdPedido() != null && item.getIdPedido() != 0) {
+				pst.setInt(4, item.getIdPedido());
+			} else {
+				pst.setNull(4, Types.INTEGER);
+			}
+			pst.setInt(5, item.getId());
+			
+			pst.executeUpdate();
+			connection.commit();
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch(SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao)
+						connection.close();
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -126,20 +136,34 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 		if(connection == null || connection.isClosed()) {
 			abrirConexao();
 		}
-		ItemPedido item = (ItemPedido)entidade;
 		PreparedStatement pst = null;
+		ItemBloqueioPedido item = (ItemBloqueioPedido)entidade;
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM ItemPedido ");
+		sql.append("SELECT * FROM ItemBloqueioPedido ");
 		sql.append("WHERE 1=1 ");
 		
+		if(item.getId() != null && item.getId() != 0) {
+			sql.append("AND id = ?");
+		}
+		if(item.getIdEstoque() != null && item.getIdEstoque() != 0) {
+			sql.append("AND id_estoque = ?");
+		}
 		if(item.getIdPedido() != null && item.getIdPedido() != 0) {
 			sql.append("AND id_pedido = ?");
 		}
 		
 		try {
-			pst = connection.prepareStatement(sql.toString());			
+			pst = connection.prepareStatement(sql.toString());		
 			int i = 1;
 			
+			if(item.getId() != null && item.getId() != 0) {
+				pst.setInt(i, item.getId());
+				i++;
+			}
+			if(item.getIdEstoque() != null && item.getIdEstoque() != 0) {
+				pst.setInt(i, item.getIdEstoque());
+				i++;
+			}
 			if(item.getIdPedido() != null && item.getIdPedido() != 0) {
 				pst.setInt(i, item.getIdPedido());
 				i++;
@@ -148,20 +172,13 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 			ResultSet rs = pst.executeQuery();
 			List<EntidadeDominio> itens = new ArrayList<EntidadeDominio>()	;
 			while(rs.next() ) {
-				item = new ItemPedido();
-				Estoque estoque = new Estoque();
-				EstoqueDAO estDao = new EstoqueDAO();
-				
+				item = new ItemBloqueioPedido();
 				item.setId(rs.getInt("id"));
 				item.setDtCadastro(rs.getDate("dtCadastro"));
+				item.setHora(rs.getTime("hora"));
 				item.setQtde(rs.getInt("qtde"));
-				item.setValorUnitario(rs.getDouble("valorUnitario"));
-				
-				estDao.ctrlTransacao = false;
-				estoque.setId(rs.getInt("id_estoque"));
-				estoque = (Estoque)estDao.consultar(estoque).get(0);
-				item.setEstoque(estoque);
-				
+				item.setIdEstoque(rs.getInt("id_estoque"));
+				item.setIdPedido(rs.getInt("id_pedido"));
 				itens.add(item);
 			}
 			rs.close();
@@ -186,5 +203,4 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 		}
 		return null;
 	}
-
 }

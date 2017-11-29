@@ -44,8 +44,16 @@ public class RegistroDAO extends AbstractJdbcDAO {
 			
 			pst = connection.prepareStatement(sql.toString(), new String[] {"id"});
 			pst.setInt(1, registro.getQtde());
-			pst.setNull(2, Types.DOUBLE);
-			pst.setDouble(3, registro.getValorVenda());
+			if(registro.getValorCompra() != null && registro.getValorCompra() != 0) {
+				pst.setDouble(2, registro.getValorCompra());
+			} else {
+				pst.setNull(2, Types.DOUBLE);
+			}
+			if(registro.getValorVenda() != null && registro.getValorVenda() != 0) {
+				pst.setDouble(3, registro.getValorVenda());
+			} else {
+				pst.setNull(3, Types.DOUBLE);
+			}
 			pst.setInt(4, registro.getTipoRegistro());
 			pst.setInt(5, registro.getIdEstoque());
 			

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head></h:head>
+<h:body>
+	<h:form>
+		<p:dataTable id="dtPedidos" var="pedido" value="#{adminMB.pedidos}">
+			<p:column headerText="ID">
+				<h:outputText value="#{pedido.id}"/>
+			</p:column>
+			<p:column headerText="STATUS">
+				<h:outputText value="#{pedido.statusPedido}"/>
+			</p:column>
+			<p:column headerText="ID CLIENTE">
+				<h:outputText value="#{pedido.cliente.id}"/>
+			</p:column>
+			<p:column headerText="NOME">
+				<h:outputText value="#{pedido.cliente.nome}"/>
+			</p:column>
+			<p:column headerText="VALOR">
+				<h:outputText value="#{pedido.valorTotalComDescontos}"/>
+			</p:column>
+			<p:column>
+				<p:commandButton action="detalhes-pedido.xhtml?faces-redirect=true" >
+					<f:setPropertyActionListener value="#{pedido}" target="#{adminMB.pedidoSelecionado}" /> 
+					<f:setPropertyActionListener value="#{adminMB.pedidoSelecionado.statusPedido}" target="#{adminMB.statusTemp}" /> 
+				</p:commandButton>
+			</p:column>			
+		</p:dataTable>
+	</h:form>
+</h:body>
+</html>

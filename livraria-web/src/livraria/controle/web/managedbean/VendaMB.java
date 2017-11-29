@@ -1,5 +1,7 @@
 package livraria.controle.web.managedbean;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ import dominio.endereco.Estado;
 import dominio.endereco.Pais;
 import dominio.endereco.TipoEndereco;
 import dominio.livro.Dimensoes;
+import dominio.livro.EnumTipoRegistroEstoque;
 import dominio.livro.Estoque;
 import dominio.livro.Livro;
 import dominio.livro.Registro;
@@ -35,6 +38,7 @@ import dominio.venda.EnumStatusPgto;
 import dominio.venda.EnumTipoEnvio;
 import dominio.venda.FormaPgto;
 import dominio.venda.Frete;
+import dominio.venda.ItemBloqueioPedido;
 import dominio.venda.ItemPedido;
 import dominio.venda.Pagamento;
 import dominio.venda.Pedido;
@@ -86,6 +90,7 @@ public class VendaMB {
 	private CustoFrete custoFreteSedex10;
 	private Frete frete;
 	private String radioSelFrete;
+	private List<ItemBloqueioPedido> itensBloqueados;
 	
 	private Cliente cliente;
 	private List<Cliente> clientes;
@@ -126,6 +131,7 @@ public class VendaMB {
 		custoFreteSedex = new CustoFrete();
 		custoFreteSedex10 = new CustoFrete();
 		frete = new Frete();
+		itensBloqueados = new ArrayList<ItemBloqueioPedido>();
 		
 		cliente = new Cliente();
 		clientes = new ArrayList<Cliente>();
@@ -207,14 +213,78 @@ public class VendaMB {
 				e.printStackTrace();
 			}
 		}
-		// CARREGANDO QTDE EM ESTOQUE
+		// CARREGANDO QTDE E VALOR DE VENDA EM ITENS EM ESTOQUE
 		for(int i = 0; i < estoques.size(); i++) {
 			if(estoques.get(i).getRegistros() != null && estoques.get(i).getRegistros().size() != 0) {
-				estoques.get(i).calcularQtdeEstoque();
-				estoques.get(i).getLivro().setPrecoVenda(estoques.get(i).calculaValorVenda());
+				calcularQtdeEstoque(estoques.get(i));
+				calculaValorVenda(estoques.get(i));
+//				estoques.get(i).calcularQtdeEstoque();
+//				estoques.get(i).getLivro().setPrecoVenda(estoques.get(i).calculaValorVenda());
 			}
 		}
 		req.update("home:dgLivros");
+	}
+	
+	public void calcularQtdeEstoque(Estoque estoque) {
+		int qtdeTotal;
+		ItemBloqueioPedido itemBloq = new ItemBloqueioPedido();
+		List<ItemBloqueioPedido> itensBloq = new ArrayList<ItemBloqueioPedido>();
+		
+		// VERIFICA REGISTRO DE ESTOQUE DE LIVRO E CALCULA A DIFERENÇA ENTRE ENTRADAS E SAÍDAS 
+		if(!estoque.getRegistros().isEmpty()) {
+			int qtdeEntrada = 0;
+			int qtdeSaida = 0;
+			for(Registro r : estoque.getRegistros()) {
+				if(r.getTipoRegistro().equals(EnumTipoRegistroEstoque.ENTRADA.getValue())) {
+					qtdeEntrada += r.getQtde();
+				}
+				else if(r.getTipoRegistro().equals(EnumTipoRegistroEstoque.SAIDA.getValue())) {
+					qtdeSaida += r.getQtde();
+				}
+			}
+			qtdeTotal = qtdeEntrada - qtdeSaida;
+			
+			// VERIFICA ITENS BLOQUEADOS POR CARRINHOS CONCORRENTES OU PEDIDOS EM PROCESSAMENTO 
+			itemBloq.setIdEstoque(estoque.getId());
+			command = commands.get("CONSULTAR");
+			Resultado rs = command.execute(itemBloq);
+			if(rs.getMsg() == null && rs.getEntidades().size() != 0) {
+				for(int i = 0; i < rs.getEntidades().size(); i++) {
+					try {
+						itensBloq.add((ItemBloqueioPedido)rs.getEntidades().get(i));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				// SUBTRAI ITENS BLOQUEADOS DO VALOR TOTAL EM ESTOQUE
+				for(ItemBloqueioPedido i : itensBloq) {
+					qtdeTotal -= i.getQtde();
+				}
+			}
+			
+			estoque.setQtdeTotal(qtdeTotal);
+		}
+	}
+	
+	public void calculaValorVenda(Estoque estoque) {
+		// O VALOR DE VENDA SERÁ CALCULADO SOMANDO-SE TODOS OS VALORES DE COMPRA DE ENTRADA
+		// DIVIDIDOS PELA QTDE TOTAL DE ENTRADAS, RESULTANDO NO VALOR MÉDIO DE COMPRA
+		// E DEPOIS MULTIPLICANDO PELA MARGEM DE LUCRO 
+		double somatorioValoresCompra = 0.0;
+		int qtdeTotalEntrada = 0;
+		double valorMedioCompra = 0.0;
+		
+		if(estoque.getRegistros() != null && estoque.getRegistros().size() != 0 && 
+				estoque.getLivro().getGrupoPrec() != null && estoque.getLivro().getGrupoPrec().getMargemDeLucro() != null) {
+			for(Registro r : estoque.getRegistros()) {
+				if(r.getTipoRegistro().equals(EnumTipoRegistroEstoque.ENTRADA.getValue())) {
+					somatorioValoresCompra += r.getValorCompra();
+					qtdeTotalEntrada += r.getQtde();
+				}
+			}
+			valorMedioCompra = somatorioValoresCompra / qtdeTotalEntrada;
+			estoque.getLivro().setPrecoVenda(valorMedioCompra + (valorMedioCompra * (estoque.getLivro().getGrupoPrec().getMargemDeLucro() / 100)));
+		}
 	}
 	
 	public void carregarClientes() {
@@ -272,10 +342,10 @@ public class VendaMB {
 		calcularFrete();
 	}
 	
-	public void adicionarItemCarrinho() {
+	public String adicionarItemCarrinho() {
 		boolean flgItemAdicionado = false;
 		ItemPedido itemPedido = new ItemPedido();
-		
+		ItemBloqueioPedido itemBloqueado = new ItemBloqueioPedido();
 		int indPedido = 0;
 		// VERIFICA SE O ITEM ADICIONADO JÁ EXISTE NO CARRINHO
 		for(int i = 0; i < itens.size(); i++) {
@@ -289,14 +359,44 @@ public class VendaMB {
 		// CASO CONTRÁRIO, SERÁ ADICIONADO O NOVO PRODUTO NO CARRINHO
 		if(flgItemAdicionado) {
 			itens.get(indPedido).setQtde(itens.get(indPedido).getQtde() + qtdeItemPedido);
+			for(ItemBloqueioPedido i : itensBloqueados) {
+				if(i.getIdEstoque().equals(itens.get(indPedido).getEstoque().getId())) {
+					i.setQtde(i.getQtde() + qtdeItemPedido);
+					command = commands.get("ALTERAR");
+					Resultado rs = command.execute(i);
+					break;
+				}
+			}
 		} else {
 			itemPedido.setQtde(qtdeItemPedido);
 			itemPedido.setEstoque(estoqueSelecionado);
-			itens.add(itemPedido);
-			pedido.setItens(itens);
+			itemPedido.setValorUnitario(estoqueSelecionado.getLivro().getPrecoVenda());
+			command = commands.get("CONSULTAR");
+			Resultado rs = command.execute(itemPedido);
+			
+			if(rs.getMsg().equals("Disponivel\n")) {
+				itens.add(itemPedido);
+				pedido.setItens(itens);
+				java.sql.Time hora = new java.sql.Time(System.currentTimeMillis());
+				itemBloqueado.setHora(hora);
+				itemBloqueado.setIdEstoque(estoqueSelecionado.getId());
+				itemBloqueado.setQtde(qtdeItemPedido);
+				itensBloqueados.add(itemBloqueado);
+				pedido.setItensBloqueados(itensBloqueados);
+				
+				command = commands.get("SALVAR");
+				rs = command.execute(itemBloqueado);
+				calculaValorTotalCarrinho();
+				return "carrinho.xhtml?faces-redirect=true";
+			} else {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Quantidade indisponível!"));
+			}
+			
 		}
-		calculaValorTotalCarrinho();
+		
 		qtdeItemPedido = 1;
+		return "";
 	}
 	
 	public void calcularFrete() {
@@ -306,8 +406,8 @@ public class VendaMB {
 		Frete freteSedexTemp = new Frete();
 		Frete freteSedex10Temp = new Frete();
 		
+		Dimensoes dim = new Dimensoes();
 		for(ItemPedido item : itens) {
-			Dimensoes dim = new Dimensoes();
 			dim.setAltura(item.getEstoque().getLivro().getDimensoes().getAltura());
 			dim.setLargura(item.getEstoque().getLivro().getDimensoes().getLargura());
 			dim.setProfundidade(item.getEstoque().getLivro().getDimensoes().getProfundidade());
@@ -321,19 +421,19 @@ public class VendaMB {
 		}
 		// PAC
 		fretePacTemp.setTipoEnvio(EnumTipoEnvio.PAC.getValue());
-		fretePacTemp.setCepOrigem("08725280");
+		fretePacTemp.setCepOrigem("01102010");
 		fretePacTemp.setCepDestino(cepDestino);
 		fretePacTemp.setLivro(livroTemp);
 		custoFretePAC = correios.calcularFrete(fretePacTemp);
 		// SEDEX
 		freteSedexTemp.setTipoEnvio(EnumTipoEnvio.SEDEX.getValue());
-		freteSedexTemp.setCepOrigem("08725280");
+		freteSedexTemp.setCepOrigem("01102010");
 		freteSedexTemp.setCepDestino(cepDestino);
 		freteSedexTemp.setLivro(livroTemp);
 		custoFreteSedex = correios.calcularFrete(freteSedexTemp);
 		// SEDEX10
 		freteSedex10Temp.setTipoEnvio(EnumTipoEnvio.SEDEX10.getValue());
-		freteSedex10Temp.setCepOrigem("08725280");
+		freteSedex10Temp.setCepOrigem("01102010");
 		freteSedex10Temp.setCepDestino(cepDestino);
 		freteSedex10Temp.setLivro(livroTemp);
 		custoFreteSedex10 = correios.calcularFrete(freteSedex10Temp);
@@ -377,9 +477,17 @@ public class VendaMB {
 	public void removerItemCarrinho(ItemPedido item) {
 		RequestContext req = RequestContext.getCurrentInstance();
 		pedido.getItens().remove(item);
+		for(ItemBloqueioPedido i : itensBloqueados) {
+			if(i.getIdEstoque().equals(item.getEstoque().getId())) {
+				command = commands.get("EXCLUIR");
+				Resultado rs = command.execute(i);
+				itensBloqueados.remove(i);
+				break;
+			}
+		}
 		calculaValorTotalCarrinho();
-		req.update("carrinho:itens");
-		req.update("carrinho:valor");
+		req.update("carrinho");
+//		req.update("carrinho:valor");
 	}
 	
 	public void aplicarCupomPromocional() {
@@ -555,10 +663,25 @@ public class VendaMB {
 		pedido.setCliente(cliente);
 		pedido.setPagamentos(pagamentos);
 		pedido.setStatusPedido(EnumStatusPedido.EM_PROCESSAMENTO.getValue());
-		
 		command = commands.get("SALVAR");
+		
+		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+		symbols.setDecimalSeparator('.');
+		DecimalFormat df = new DecimalFormat("#.00", symbols); 
+		pedido.setValorTotal(Double.parseDouble(df.format(pedido.getValorTotal())));
+		pedido.setValorTotalComDescontos(Double.parseDouble(df.format(pedido.getValorTotalComDescontos())));
+		
 		Resultado rs = command.execute(pedido);
+		if (rs.getMsg() != null) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Pedido feito com sucesso!"));
+		}
+		
 		// add salvar endereço, caso flgSalvarEnd == true
+		// add salvar cartao, caso flgSalvarCartao == true
 		
 	}
 	
@@ -873,6 +996,14 @@ public class VendaMB {
 
 	public void setRadioSelFrete(String radioSelFrete) {
 		this.radioSelFrete = radioSelFrete;
+	}
+
+	public List<ItemBloqueioPedido> getItensBloqueados() {
+		return itensBloqueados;
+	}
+
+	public void setItensBloqueados(List<ItemBloqueioPedido> itensBloqueados) {
+		this.itensBloqueados = itensBloqueados;
 	}
 	
 }

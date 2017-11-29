@@ -140,15 +140,22 @@ public class EstoqueDAO extends AbstractJdbcDAO {
 		sql.append("SELECT * FROM Estoque ");
 		sql.append("WHERE 1=1 ");
 		
-		if(estoque.getLivro().getId() != null && estoque.getLivro().getId() != 0) {
-			sql.append("AND id_livro = ?");
+		if(estoque.getId() != null && estoque.getId() != 0) {
+			sql.append("AND id = ? ");
+		}
+		if(estoque.getLivro() != null && estoque.getLivro().getId() != null && estoque.getLivro().getId() != 0) {
+			sql.append("AND id_livro = ? ");
 		}
 		
 		try {
 			pst = connection.prepareStatement(sql.toString());		
 			int i = 1;
 			
-			if(estoque.getLivro().getId() != null && estoque.getLivro().getId() != 0) {
+			if(estoque.getId() != null && estoque.getId() != 0) {
+				pst.setInt(i, estoque.getId());
+				i++;
+			}
+			if(estoque.getLivro() != null && estoque.getLivro().getId() != null && estoque.getLivro().getId() != 0) {
 				pst.setInt(i, estoque.getLivro().getId());
 				i++;
 			}

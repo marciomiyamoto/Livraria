@@ -1,27 +1,33 @@
 package dominio.venda;
 
-import dominio.EntidadeDominio;
-import dominio.livro.Estoque;
-import dominio.livro.Livro;
+import java.sql.Time;
 
-public class ItemPedido extends EntidadeDominio {
+import dominio.EntidadeDominio;
+
+public class ItemBloqueioPedido extends EntidadeDominio{
 	
+	private Time hora;
 	private Integer qtde;
-	private Estoque estoque;
+	private Integer idEstoque;
 	private Integer idPedido;
-	private Double valorUnitario;
 	
+	public Time getHora() {
+		return hora;
+	}
+	public void setHora(Time hora) {
+		this.hora = hora;
+	}
 	public Integer getQtde() {
 		return qtde;
 	}
 	public void setQtde(Integer qtde) {
 		this.qtde = qtde;
 	}
-	public Estoque getEstoque() {
-		return estoque;
+	public Integer getIdEstoque() {
+		return idEstoque;
 	}
-	public void setEstoque(Estoque estoque) {
-		this.estoque = estoque;
+	public void setIdEstoque(Integer idEstoque) {
+		this.idEstoque = idEstoque;
 	}
 	public Integer getIdPedido() {
 		return idPedido;
@@ -29,20 +35,14 @@ public class ItemPedido extends EntidadeDominio {
 	public void setIdPedido(Integer idPedido) {
 		this.idPedido = idPedido;
 	}
-	public Double getValorUnitario() {
-		return valorUnitario;
-	}
-	public void setValorUnitario(Double valorUnitario) {
-		this.valorUnitario = valorUnitario;
-	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((estoque == null) ? 0 : estoque.hashCode());
+		result = prime * result + ((hora == null) ? 0 : hora.hashCode());
+		result = prime * result + ((idEstoque == null) ? 0 : idEstoque.hashCode());
 		result = prime * result + ((idPedido == null) ? 0 : idPedido.hashCode());
 		result = prime * result + ((qtde == null) ? 0 : qtde.hashCode());
-		result = prime * result + ((valorUnitario == null) ? 0 : valorUnitario.hashCode());
 		return result;
 	}
 	@Override
@@ -53,11 +53,16 @@ public class ItemPedido extends EntidadeDominio {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ItemPedido other = (ItemPedido) obj;
-		if (estoque == null) {
-			if (other.estoque != null)
+		ItemBloqueioPedido other = (ItemBloqueioPedido) obj;
+		if (hora == null) {
+			if (other.hora != null)
 				return false;
-		} else if (!estoque.equals(other.estoque))
+		} else if (!hora.equals(other.hora))
+			return false;
+		if (idEstoque == null) {
+			if (other.idEstoque != null)
+				return false;
+		} else if (!idEstoque.equals(other.idEstoque))
 			return false;
 		if (idPedido == null) {
 			if (other.idPedido != null)
@@ -69,17 +74,12 @@ public class ItemPedido extends EntidadeDominio {
 				return false;
 		} else if (!qtde.equals(other.qtde))
 			return false;
-		if (valorUnitario == null) {
-			if (other.valorUnitario != null)
-				return false;
-		} else if (!valorUnitario.equals(other.valorUnitario))
-			return false;
 		return true;
 	}
 	@Override
 	public String toString() {
-		return "ItemPedido [qtde=" + qtde + ", estoque=" + estoque + ", idPedido=" + idPedido + ", valorUnitario="
-				+ valorUnitario + "]";
+		return "ItemBloqueioPedido [hora=" + hora + ", qtde=" + qtde + ", idEstoque=" + idEstoque + ", idPedido="
+				+ idPedido + "]";
 	}
 
 }

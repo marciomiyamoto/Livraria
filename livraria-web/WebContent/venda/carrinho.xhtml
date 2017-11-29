@@ -9,7 +9,7 @@
 <h:head></h:head>
 <h:body>
 	<h:form id="carrinho">
-		<p:dataTable id="itens" var="item" value="#{vendaMB.pedido.itens}">
+		<p:dataTable id="itens" var="item" value="#{vendaMB.pedido.itens}" rendered="#{vendaMB.pedido.itens.size() != 0}">
 				<p:column headerText="Produto">
 					<h:outputText value="#{item.estoque.livro.titulo}"/>
 				</p:column>
@@ -29,7 +29,7 @@
 				</p:column>
 		</p:dataTable>
 		<p:spacer/>
-		<p:panelGrid id="valor">
+		<p:panelGrid id="valor" rendered="#{vendaMB.pedido.itens.size() != 0}">
 			<p:row>
 				<p:column>
 					<h:outputText value="CEP:"/>
@@ -106,11 +106,24 @@
 						value="Fechar compra" 
 						actionListener="#{vendaMB.carregarClienteSelecionado}"
 						action="pedido.xhtml?faces-redirect=true" 
-						ajax="false"/>
+						ajax="false"
+						disabled="#{vendaMB.pedido.itens.size() == 0}"/>
 				</p:column>
 			</p:row>
 		</p:panelGrid>
-		<p:link value="Continuar comprando" outcome="home.xhtml"/>
+		<p:panelGrid styleClass="ui-noborder">
+			<p:row>
+				<p:column>
+					<p:outputLabel value="Seu carrinho está vazio :(" rendered="#{vendaMB.pedido.itens.size() == 0}" />
+				</p:column>
+			</p:row>
+			<p:row><p:column><p:spacer></p:spacer></p:column></p:row>
+			<p:row>
+				<p:column>
+					<p:link value="Continuar comprando" outcome="home.xhtml"/>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
 	</h:form>
 </h:body>
 </html>

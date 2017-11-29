@@ -149,11 +149,25 @@ public class CartaoDAO extends AbstractJdbcDAO {
 		sql.append("b.id AS b_id, b.dtCadastro AS b_dtCadastro, b.bin AS bin, b.nome AS bandeira ");
 		sql.append("FROM cartao c ");
 		sql.append("JOIN BANDEIRACARTAO b ON b.id = c.ID_BANDEIRA ");
-		sql.append("WHERE c.id_cliente = ?");
+		sql.append("WHERE 1=1 ");
+		
+		if(cartao.getId() != null && cartao.getId() != 0) {
+			sql.append("AND c.id = ? ");
+		}
+		if(cartao.getIdCliente() != null && cartao.getIdCliente() != 0) {
+			sql.append("AND c.id_cliente = ?");
+		}
 		
 		try {
 			pst = connection.prepareStatement(sql.toString());
-			pst.setInt(1, cartao.getIdCliente());
+			int i = 1;
+			
+			if(cartao.getId() != null && cartao.getId() != 0) {
+				pst.setInt(i, cartao.getId());
+			}
+			if(cartao.getIdCliente() != null && cartao.getIdCliente() != 0) {
+				pst.setInt(i, cartao.getIdCliente());
+			}
 			ResultSet rs = pst.executeQuery();
 			List<EntidadeDominio> cartoes = new ArrayList<EntidadeDominio>()	;
 			while(rs.next() ) {

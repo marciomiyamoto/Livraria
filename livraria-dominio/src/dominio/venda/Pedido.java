@@ -15,6 +15,7 @@ public class Pedido extends EntidadeDominio {
 	private Integer statusPedido;
 	private List<Pagamento> pagamentos;
 	private List<ItemPedido> itens;
+	private List<ItemBloqueioPedido> itensBloqueados;
 	private Endereco endEntrega;
 	private CupomPromocional cupomPromocional;
 	
@@ -72,6 +73,12 @@ public class Pedido extends EntidadeDominio {
 	public void setValorTotalComDescontos(Double valorTotalComDescontos) {
 		this.valorTotalComDescontos = valorTotalComDescontos;
 	}
+	public List<ItemBloqueioPedido> getItensBloqueados() {
+		return itensBloqueados;
+	}
+	public void setItensBloqueados(List<ItemBloqueioPedido> itensBloqueados) {
+		this.itensBloqueados = itensBloqueados;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -81,6 +88,7 @@ public class Pedido extends EntidadeDominio {
 		result = prime * result + ((custoFrete == null) ? 0 : custoFrete.hashCode());
 		result = prime * result + ((endEntrega == null) ? 0 : endEntrega.hashCode());
 		result = prime * result + ((itens == null) ? 0 : itens.hashCode());
+		result = prime * result + ((itensBloqueados == null) ? 0 : itensBloqueados.hashCode());
 		result = prime * result + ((pagamentos == null) ? 0 : pagamentos.hashCode());
 		result = prime * result + ((statusPedido == null) ? 0 : statusPedido.hashCode());
 		result = prime * result + ((valorTotal == null) ? 0 : valorTotal.hashCode());
@@ -121,6 +129,11 @@ public class Pedido extends EntidadeDominio {
 				return false;
 		} else if (!itens.equals(other.itens))
 			return false;
+		if (itensBloqueados == null) {
+			if (other.itensBloqueados != null)
+				return false;
+		} else if (!itensBloqueados.equals(other.itensBloqueados))
+			return false;
 		if (pagamentos == null) {
 			if (other.pagamentos != null)
 				return false;
@@ -147,8 +160,8 @@ public class Pedido extends EntidadeDominio {
 	public String toString() {
 		return "Pedido [valorTotal=" + valorTotal + ", valorTotalComDescontos=" + valorTotalComDescontos + ", cliente="
 				+ cliente + ", custoFrete=" + custoFrete + ", statusPedido=" + statusPedido + ", pagamentos="
-				+ pagamentos + ", itens=" + itens + ", endEntrega=" + endEntrega + ", cupomPromocional="
-				+ cupomPromocional + "]";
+				+ pagamentos + ", itens=" + itens + ", itensBloqueados=" + itensBloqueados + ", endEntrega="
+				+ endEntrega + ", cupomPromocional=" + cupomPromocional + "]";
 	}
 	
 }

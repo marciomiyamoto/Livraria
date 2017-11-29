@@ -9,6 +9,7 @@
 <h:head/>
 <h:body>
 	<h:form id="livro">
+		<p:growl id="growl" showDetail="true" life="8000" />
 		<p:panelGrid >
 			<p:row>
 				<p:column>
@@ -39,8 +40,8 @@
 					<p:commandButton
 						value="Comprar"
 						ajax="false"
-						actionListener="#{vendaMB.adicionarItemCarrinho}"
-						action="carrinho.xhtml?faces-redirect=true"
+						action="#{vendaMB.adicionarItemCarrinho}"
+						update="growl"
 						/>
 					
 				</p:column>
