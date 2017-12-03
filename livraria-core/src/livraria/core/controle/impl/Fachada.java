@@ -70,7 +70,10 @@ import livraria.core.dao.impl.UsuarioDAO;
 import livraria.core.negocio.impl.AssociarMotivoAtivacao;
 import livraria.core.negocio.impl.AssociarMotivoInativacao;
 import livraria.core.negocio.impl.ValidarAtualizacaoStatusPedido;
+import livraria.core.negocio.impl.ValidarDadosObrigatoriosCartao;
+import livraria.core.negocio.impl.ValidarDadosObrigatoriosCliente;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosConfigLivro;
+import livraria.core.negocio.impl.ValidarDadosObrigatoriosEndereco;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosLivro;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosPedido;
 import livraria.core.negocio.impl.ValidarEstoqueItemPedido;
@@ -78,6 +81,8 @@ import livraria.core.negocio.impl.ValidarFrete;
 import livraria.core.negocio.impl.ValidarEstoqueItensFinalizacaoPedido;
 import livraria.core.negocio.impl.ValidarPagamentosCupomTroca;
 import livraria.core.negocio.impl.ValidarPagamentosPedido;
+import livraria.core.negocio.impl.ValidarSenhaAntigaCliente;
+import livraria.core.negocio.impl.ValidarSenhaCadastroCliente;
 import livraria.core.negocio.impl.ValidarValorMinMaxCartaoCredito;
 import livraria.core.negocio.impl.ValidarValorTotalPagamentos;
 
@@ -179,6 +184,11 @@ public class Fachada implements IFachada {
 		ValidarDadosObrigatoriosPedido vDadosObrigPedido = new ValidarDadosObrigatoriosPedido();
 		ValidarPagamentosPedido vPagPedidos = new ValidarPagamentosPedido();
 		ValidarAtualizacaoStatusPedido vAtualStatPedido = new ValidarAtualizacaoStatusPedido();
+		ValidarSenhaCadastroCliente vSenhaCliente = new ValidarSenhaCadastroCliente();
+		ValidarDadosObrigatoriosCliente vDadosCliente = new ValidarDadosObrigatoriosCliente();
+		ValidarSenhaAntigaCliente vSenhaAntigaCli = new ValidarSenhaAntigaCliente();
+		ValidarDadosObrigatoriosEndereco vDadosEnd = new ValidarDadosObrigatoriosEndereco();
+		ValidarDadosObrigatoriosCartao vDadosCartao = new ValidarDadosObrigatoriosCartao();
 		
 // LIVRO
 		/* Criando uma lista para conter as regras de negócio de livro
@@ -263,7 +273,85 @@ public class Fachada implements IFachada {
 		rnsPedido.put("ALTERAR", rnsAtualizarPedido);
 		
 		rns.put(Pedido.class.getName(), rnsPedido);
-	}
+		
+// CLIENTE
+		// SALVAR
+		/* Criando uma lista para conter as regras de negócio de Cliente
+		 * quando a operação for salvar
+		 */
+		List<IStrategy> rnsSalvarCliente = new ArrayList<IStrategy>();
+		rnsSalvarCliente.add(vSenhaCliente);
+		rnsSalvarCliente.add(vDadosCliente);
+		
+		/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+		 * por operação  do Cliente
+		 */
+		Map<String, List<IStrategy>> rnsCliente = new HashMap<String, List<IStrategy>>();
+		rnsCliente.put("SALVAR", rnsSalvarCliente);
+		
+		// ALTERAR
+		/* Criando uma lista para conter as regras de negócio de Cliente
+		 * quando a operação for ALTERAR
+		 */
+		List<IStrategy> rnsAtualizarCliente = new ArrayList<IStrategy>();
+		rnsAtualizarCliente.add(vSenhaAntigaCli);
+		rnsAtualizarCliente.add(vSenhaCliente);
+		rnsAtualizarCliente.add(vDadosCliente);
+		
+		rnsCliente.put("ALTERAR", rnsAtualizarCliente);
+		
+		rns.put(Cliente.class.getName(), rnsCliente);
+		
+// ENDEREÇO
+	// SALVAR
+	/* Criando uma lista para conter as regras de negócio de Endereço
+	 * quando a operação for salvar
+	 */
+	List<IStrategy> rnsSalvarEndereco = new ArrayList<IStrategy>();
+	rnsSalvarEndereco.add(vDadosEnd);
+	
+	/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+	 * por operação  do Endereço
+	 */
+	Map<String, List<IStrategy>> rnsEndereco = new HashMap<String, List<IStrategy>>();
+	rnsEndereco.put("SALVAR", rnsSalvarEndereco);
+	
+	// ALTERAR
+	/* Criando uma lista para conter as regras de negócio de Endereço
+	 * quando a operação for ALTERAR
+	 */
+	List<IStrategy> rnsAtualizarEndereco = new ArrayList<IStrategy>();
+	rnsAtualizarEndereco.add(vDadosEnd);
+	
+	rnsEndereco.put("ALTERAR", rnsAtualizarEndereco);
+	
+	rns.put(Endereco.class.getName(), rnsEndereco);
+	
+// CARTÃO
+	// SALVAR
+	/* Criando uma lista para conter as regras de negócio de Cartão
+	 * quando a operação for salvar
+	 */
+	List<IStrategy> rnsSalvarCartao = new ArrayList<IStrategy>();
+	rnsSalvarCartao.add(vDadosCartao);
+	
+	/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+	 * por operação  do Cartão
+	 */
+	Map<String, List<IStrategy>> rnsCartao = new HashMap<String, List<IStrategy>>();
+	rnsCartao.put("SALVAR", rnsSalvarCartao);
+	
+	// ALTERAR
+	/* Criando uma lista para conter as regras de negócio de Cartão
+	 * quando a operação for ALTERAR
+	 */
+	List<IStrategy> rnsAtualizarCartao = new ArrayList<IStrategy>();
+	rnsAtualizarCartao.add(vDadosCartao);
+	
+	rnsCartao.put("ALTERAR", rnsAtualizarCartao);
+	
+	rns.put(Cartao.class.getName(), rnsCartao);
+}
 	
 	
 	@Override

@@ -40,10 +40,31 @@ public class CorreiosWS {
 		String sCepOrigem = frete.getCepOrigem();
 		String sCepDestino = frete.getCepDestino();
 		String nVlPeso = frete.getLivro().getDimensoes().getPeso().toString();
+		if(frete.getLivro().getDimensoes().getPeso() > 30) {
+			nVlPeso = "30";
+		}
 		String nCdFormato = "1";
 		String nVlComprimento = frete.getLivro().getDimensoes().getProfundidade().toString();
+		if(frete.getLivro().getDimensoes().getProfundidade() > 105) {
+			nVlComprimento = "105";
+		}
+		if(frete.getLivro().getDimensoes().getProfundidade() < 16) {
+			nVlComprimento = "16";
+		}
 		String nVlAltura = frete.getLivro().getDimensoes().getAltura().toString();
+		if(frete.getLivro().getDimensoes().getAltura() > 105) {
+			nVlAltura = "105";
+		}
+		if(frete.getLivro().getDimensoes().getAltura() < 2) {
+			nVlAltura = "2";
+		}
 		String nVlLargura = frete.getLivro().getDimensoes().getLargura().toString();
+		if(frete.getLivro().getDimensoes().getLargura() > 105) {
+			nVlLargura = "105";
+		}
+		if(frete.getLivro().getDimensoes().getLargura() < 11) {
+			nVlLargura = "11";
+		}
 		String nVlDiametro = "0";
 		String sCdMaoPropria = "s";
 		String nVlValorDeclarado = "0";
@@ -111,7 +132,7 @@ public class CorreiosWS {
 		    NodeList nodes = doc.getElementsByTagName("cServico");
 		    //Faz a leitura dos nodes
 		    Locale Local = new Locale("pt","BR");
-		    DecimalFormat df = new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Local));
+		    DecimalFormat df = new DecimalFormat(".00", new DecimalFormatSymbols(Local));
 		    for (int j = 0; j < nodes.getLength(); j++) {
 		      Element element = (Element) nodes.item(j);
 		      NodeList erro = element.getElementsByTagName("Erro");
@@ -125,7 +146,7 @@ public class CorreiosWS {
 		      NodeList valor = element.getElementsByTagName("Valor");
 		      line = (Element) valor.item(0);
 		      String valorString = getCharacterDataFromElement(line);
-		      custoFrete.setValor((Double)df.parseObject(valorString));
+		      custoFrete.setValor((Double)df.parse(valorString).doubleValue());
 		      System.out.println("Valor: " + getCharacterDataFromElement(line));
 		      NodeList prazoEntrega = element.getElementsByTagName("PrazoEntrega");
 		      line = (Element) prazoEntrega.item(0);

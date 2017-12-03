@@ -1,5 +1,6 @@
 package livraria.controle.web.managedbean;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import dominio.Genero;
 import dominio.Telefone;
 import dominio.cliente.Cartao;
 import dominio.cliente.Cliente;
+import dominio.cliente.ClienteEnd;
+import dominio.cliente.EnumTipoCartao;
 import dominio.endereco.Cidade;
 import dominio.endereco.Endereco;
 import dominio.endereco.EnumEndereco;
@@ -50,6 +53,7 @@ import livraria.controle.web.command.impl.SalvarCommand;
 import livraria.controle.web.command.impl.VisualizarCommand;
 import livraria.controle.web.util.CorreiosWS;
 import livraria.core.aplicacao.Resultado;
+import livraria.core.dao.impl.ClienteEndDAO;
 
 @ManagedBean
 @SessionScoped
@@ -79,9 +83,11 @@ public class VendaMB {
 	private Cidade cidadeSelecionada;
 	private List<Cidade> cidades;
 	private Boolean flgSalvarEnd;
+	private Boolean flgSalvarCartao;
 	private String selFormaPgto;
 	private Cartao cartao;
 	private Cartao cartaoSelecionado;
+	private Cartao novoCartao;
 	private List<Pagamento> cartoesPtgo;
 	private List<Pagamento> cuponsTrocaPgto;
 	private String cepDestino;
@@ -125,6 +131,7 @@ public class VendaMB {
 		cidades = new ArrayList<Cidade>();
 		cartao = new Cartao();
 		cartaoSelecionado = new Cartao();
+		novoCartao = new Cartao();
 		cartoesPtgo = new ArrayList<Pagamento>();
 		cuponsTrocaPgto = new ArrayList<Pagamento>();
 		custoFretePAC = new CustoFrete();
@@ -132,6 +139,8 @@ public class VendaMB {
 		custoFreteSedex10 = new CustoFrete();
 		frete = new Frete();
 		itensBloqueados = new ArrayList<ItemBloqueioPedido>();
+		flgSalvarEnd = false;
+		flgSalvarCartao = false;
 		
 		cliente = new Cliente();
 		clientes = new ArrayList<Cliente>();
@@ -408,9 +417,15 @@ public class VendaMB {
 		
 		Dimensoes dim = new Dimensoes();
 		for(ItemPedido item : itens) {
-			dim.setAltura(item.getEstoque().getLivro().getDimensoes().getAltura());
-			dim.setLargura(item.getEstoque().getLivro().getDimensoes().getLargura());
-			dim.setProfundidade(item.getEstoque().getLivro().getDimensoes().getProfundidade());
+			if(dim.getAltura() == null || item.getEstoque().getLivro().getDimensoes().getAltura() > dim.getAltura()) {
+				dim.setAltura(item.getEstoque().getLivro().getDimensoes().getAltura());
+			}
+			if(dim.getLargura() == null || item.getEstoque().getLivro().getDimensoes().getLargura() > dim.getLargura()) {
+				dim.setLargura(item.getEstoque().getLivro().getDimensoes().getLargura());
+			}
+			if(dim.getProfundidade() == null || item.getEstoque().getLivro().getDimensoes().getProfundidade() > dim.getProfundidade()) {
+				dim.setProfundidade(item.getEstoque().getLivro().getDimensoes().getProfundidade());
+			}
 			// O PESO TOTAL DO PEDIDO SERÁ CALCULADO PELA SOMA DO PESO DE TODOS OS ITENS
 			if(dim.getPeso() != null) {
 				dim.setPeso(dim.getPeso() + item.getEstoque().getLivro().getDimensoes().getPeso() * item.getQtde());
@@ -567,6 +582,7 @@ public class VendaMB {
 			cartaoTemp.setIdCliente(cartao.getIdCliente());
 			cartaoTemp.setNomeImpresso(cartao.getNomeImpresso());
 			cartaoTemp.setNumero(cartao.getNumero());
+			cartaoTemp.setTipoCartao(EnumTipoCartao.PEDIDO.getValue());
 			
 			formaPgto.setCartao(cartaoTemp);
 			pgtoTemp.setFormaPgto(formaPgto);
@@ -602,6 +618,25 @@ public class VendaMB {
 		selFormaPgto = "";
 		cupomTroca.setCodigo("");
 		cupomTroca.setId(0);
+	}
+	
+	public void calculaPgtoValTotalRestante() {
+		double valorTemp = 0;
+		FormaPgto formaPgto = new FormaPgto();
+		Pagamento pgtoTemp = new Pagamento();
+		
+		for(Pagamento p : pagamentos) {
+			valorTemp += p.getValor();
+		}
+		cartao.setTipoCartao(EnumTipoCartao.PEDIDO.getValue());
+		formaPgto.setCartao(cartao);
+		pgtoTemp.setFormaPgto(formaPgto);
+		pgtoTemp.setValor(pedido.getValorTotalComDescontos() - valorTemp);
+		cartoesPtgo.add(pgtoTemp);
+		
+		pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
+		pagamentos.add(pgtoTemp);
+		RequestContext.getCurrentInstance().execute("PF('dialogPgto').hide()");
 	}
 	
 	public void validarCupomTroca() {
@@ -663,25 +698,51 @@ public class VendaMB {
 		pedido.setCliente(cliente);
 		pedido.setPagamentos(pagamentos);
 		pedido.setStatusPedido(EnumStatusPedido.EM_PROCESSAMENTO.getValue());
-		command = commands.get("SALVAR");
+		
+		Resultado rs;
+		// salvar cartao, caso flgSalvarCartao == true
+		if(flgSalvarCartao) {
+			novoCartao.setIdCliente(cliente.getId());
+			
+			command = commands.get("SALVAR");
+			rs = command.execute(novoCartao);
+		}
 		
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
 		symbols.setDecimalSeparator('.');
 		DecimalFormat df = new DecimalFormat("#.00", symbols); 
 		pedido.setValorTotal(Double.parseDouble(df.format(pedido.getValorTotal())));
 		pedido.setValorTotalComDescontos(Double.parseDouble(df.format(pedido.getValorTotalComDescontos())));
+		if(pedido.getPagamentos() != null) {
+			for(Pagamento p : pedido.getPagamentos()) {
+				p.setValor(Double.parseDouble(df.format(p.getValor())));
+			}
+		}
 		
-		Resultado rs = command.execute(pedido);
+		command = commands.get("SALVAR");
+		rs = command.execute(pedido);
 		if (rs.getMsg() != null) {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Pedido feito com sucesso!"));
+			pedido = (Pedido)rs.getEntidades().get(0);
+			if(flgSalvarEnd) {
+				ClienteEnd cliEnd = new ClienteEnd();
+				cliEnd.setIdCliente(cliente.getId());
+				cliEnd.setIdEndereco(pedido.getEndEntrega().getId());
+				
+				command = commands.get("SALVAR");
+				rs = command.execute(cliEnd);
+			}
+			try {
+				FacesContext.getCurrentInstance().getExternalContext().redirect("finalizado.xhtml");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		// add salvar endereço, caso flgSalvarEnd == true
-		// add salvar cartao, caso flgSalvarCartao == true
 		
 	}
 	
@@ -1004,6 +1065,22 @@ public class VendaMB {
 
 	public void setItensBloqueados(List<ItemBloqueioPedido> itensBloqueados) {
 		this.itensBloqueados = itensBloqueados;
+	}
+
+	public Boolean getFlgSalvarCartao() {
+		return flgSalvarCartao;
+	}
+
+	public void setFlgSalvarCartao(Boolean flgSalvarCartao) {
+		this.flgSalvarCartao = flgSalvarCartao;
+	}
+
+	public Cartao getNovoCartao() {
+		return novoCartao;
+	}
+
+	public void setNovoCartao(Cartao novoCartao) {
+		this.novoCartao = novoCartao;
 	}
 	
 }

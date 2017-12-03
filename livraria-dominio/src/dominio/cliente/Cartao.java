@@ -12,6 +12,7 @@ public class Cartao extends EntidadeDominio {
 	private Date dtVencimento;
 	private BandeiraCartao bandeira;
 	private Integer idCliente;
+	private Integer tipoCartao;
 	
 	public Long getNumero() {
 		return numero;
@@ -49,6 +50,12 @@ public class Cartao extends EntidadeDominio {
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
 	}
+	public Integer getTipoCartao() {
+		return tipoCartao;
+	}
+	public void setTipoCartao(Integer tipoCartao) {
+		this.tipoCartao = tipoCartao;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -59,6 +66,7 @@ public class Cartao extends EntidadeDominio {
 		result = prime * result + ((idCliente == null) ? 0 : idCliente.hashCode());
 		result = prime * result + ((nomeImpresso == null) ? 0 : nomeImpresso.hashCode());
 		result = prime * result + ((numero == null) ? 0 : numero.hashCode());
+		result = prime * result + ((tipoCartao == null) ? 0 : tipoCartao.hashCode());
 		return result;
 	}
 	@Override
@@ -100,12 +108,18 @@ public class Cartao extends EntidadeDominio {
 				return false;
 		} else if (!numero.equals(other.numero))
 			return false;
+		if (tipoCartao == null) {
+			if (other.tipoCartao != null)
+				return false;
+		} else if (!tipoCartao.equals(other.tipoCartao))
+			return false;
 		return true;
 	}
 	@Override
 	public String toString() {
 		return "Cartao [numero=" + numero + ", nomeImpresso=" + nomeImpresso + ", codSeguranca=" + codSeguranca
-				+ ", dtVencimento=" + dtVencimento + ", bandeira=" + bandeira + ", idCliente=" + idCliente + "]";
+				+ ", dtVencimento=" + dtVencimento + ", bandeira=" + bandeira + ", idCliente=" + idCliente
+				+ ", tipoCartao=" + tipoCartao + "]";
 	}
 	
 }

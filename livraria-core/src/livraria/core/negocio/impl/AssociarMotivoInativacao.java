@@ -13,7 +13,7 @@ public class AssociarMotivoInativacao implements IStrategy {
 			Livro livro = (Livro)entidade;
 			if(livro.getCatAtivInativacao().getTipo() != null && !livro.getCatAtivInativacao().getTipo().trim().equals("")){
 				if(livro.getCatAtivInativacao().getTipo().equals("inativacao")) {
-					if(livro.getCatAtivInativacao().getId() == 0 || 
+					if(livro.getCatAtivInativacao().getId() == null || livro.getCatAtivInativacao().getId() == 0 || 
 							livro.getJustificativa() == null || livro.getJustificativa().trim().equals("")) {
 						return "Todo livro deve ter uma justificativa e uma categoria de INATIVAÇÃO associada!";
 					}

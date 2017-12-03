@@ -133,7 +133,7 @@
 							</p:column>
 							<p:column>
 								<h:outputText value="PAC: R$#{vendaMB.custoFretePAC.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 							<p:column>
@@ -150,7 +150,7 @@
 							</p:column>
 							<p:column>
 								<h:outputText value="Sedex: #{vendaMB.custoFreteSedex.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 							<p:column>
@@ -167,7 +167,7 @@
 							</p:column>
 							<p:column>
 								<h:outputText value="Sedex10: #{vendaMB.custoFreteSedex10.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 							<p:column>
@@ -274,7 +274,9 @@
 												<p:outputLabel value="Valor:" style="font-weight: bold;"/>
 											</p:column>
 											<p:column>
-												<h:outputText value="#{cart.valor}"/>
+												<h:outputText value="#{cart.valor}">
+													<f:convertNumber pattern=".00" locale="pt_BR"/>
+												</h:outputText>
 											</p:column>
 										</p:row>
 										<p:row>
@@ -309,7 +311,9 @@
 												<h:outputText value="Valor:" style="font-weight: bold;"/>
 											</p:column>
 											<p:column>
-												<h:outputText value="#{cupom.formaPgto.cupomTroca.valor}"/>
+												<h:outputText value="#{cupom.formaPgto.cupomTroca.valor}">
+													<f:convertNumber pattern=".00" locale="pt_BR"/>
+												</h:outputText>
 											</p:column>
 										</p:row>
 										<p:row>
@@ -338,7 +342,7 @@
 							</p:column>
 							<p:column>
 								<h:outputText value="#{vendaMB.pedido.valorTotal}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 						</p:row>
@@ -348,7 +352,7 @@
 							</p:column>
 							<p:column>
 								<h:outputText value="#{vendaMB.pedido.custoFrete.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 						</p:row>
@@ -358,7 +362,7 @@
 							</p:column>
 							<p:column>
 								<h:outputText value="#{vendaMB.descontoCupomPromocional}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 						</p:row>
@@ -369,7 +373,7 @@
 							<p:column>
 								<h1>
 									<h:outputText value="#{vendaMB.pedido.valorTotalComDescontos}" >
-										<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+										<f:convertNumber pattern=".00" locale="pt_BR"/>
 									</h:outputText>
 								</h1>
 							</p:column>
@@ -481,8 +485,9 @@
 					</p:row>
 					<p:row>
 						<p:column>
-							<p:commandButton value="Selecionar" oncomplete="PF('dialogEnderecos').hide()" update="pedido:endEntrega">
+							<p:commandButton value="Selecionar" action="#{vendaMB.calcularFrete}" oncomplete="PF('dialogEnderecos').hide()" update="pedido:pgPedido">
 								<f:setPropertyActionListener value="#{end}" target="#{vendaMB.pedido.endEntrega}" />
+								<f:setPropertyActionListener value="#{end.cep}" target="#{vendaMB.cepDestino}" />
 							</p:commandButton>
 						</p:column>
 					</p:row>
@@ -612,8 +617,10 @@
 					<h:outputText value="Salvar endereço no perfil"/>
 				</p:row>
 				<p:row>
-					<p:commandButton value="Salvar"	actionListener="#{vendaMB.adicionaNovoEndereco}" 
-					oncomplete="PF('dialogAdcEndereco').hide()" update="pedido:endEntrega"/>
+					<p:commandButton value="Salvar"	actionListener="#{vendaMB.adicionaNovoEndereco}" action="#{vendaMB.calcularFrete}"
+					oncomplete="PF('dialogAdcEndereco').hide()" update="pedido:pgPedido">
+						<f:setPropertyActionListener value="#{vendaMB.novoEndereco.cep}" target="#{vendaMB.cepDestino}" />
+					</p:commandButton>
 				</p:row>
 			</h:panelGrid>
 		</h:form>
@@ -692,6 +699,9 @@
 											<p:column>
 												<p:inputText value="#{vendaMB.pagamento.valor}"/>
 											</p:column>
+											<p:column>
+												<p:commandButton value="Valor total / restante" actionListener="#{vendaMB.calculaPgtoValTotalRestante}" update="growl pedido:pgPedido formPgto:pgFormaPgto"/>
+											</p:column>
 										</p:row>
 										<p:row><p:column><p:spacer></p:spacer></p:column></p:row>
 										<p:row>
@@ -731,7 +741,7 @@
 							<p:row><p:column><p:spacer></p:spacer></p:column></p:row>
 							<p:row>
 								<p:column>
-									<p:commandButton value="Adicionar" actionListener="#{vendaMB.adicionarPagamento}" update="growl pedido:pgPedido"/>
+									<p:commandButton value="Adicionar" actionListener="#{vendaMB.adicionarPagamento}" update="growl pedido:pgPedido formPgto:pgFormaPgto"/>
 								</p:column>
 							</p:row>
 						</p:panelGrid>

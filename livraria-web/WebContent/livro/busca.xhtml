@@ -308,12 +308,7 @@
         </p:outputPanel>
         
         <p:commandButton value="Alterar livro" action="#{livroMB.editarLivro}"/>
-        <p:commandButton value="Alterar estoque"/>
-        <p:commandButton value="Excluir livro" actionListener="#{livroMB.excluirLivro}" oncomplete="PF('dialogLivro').hide()" update="growlDlg"/>
-                
-        	<p:panelGrid styleClass="ui-noborder">
-        		
-        	</p:panelGrid>
+       
         <fieldset style="margin-top:20px">
         	<legend>Configurações de livro</legend>
         	<p:panelGrid id="configLivro" styleClass="ui-noborder">

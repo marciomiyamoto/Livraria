@@ -75,7 +75,6 @@ public class ClienteMB {
 	private TipoEndereco tipoEndereco;
 	private TipoEndereco tipoEnderecoSelecionado;
 	private List<TipoEndereco> tiposEndereco;
-	private String senhaRepetida;
 	private String maskDtNascimento;
 	private Telefone telFixo;
 	private Telefone telCelular;
@@ -115,7 +114,6 @@ public class ClienteMB {
 		tipoEndereco = new TipoEndereco();
 		tipoEnderecoSelecionado = new TipoEndereco();
 		tiposEndereco = new ArrayList<TipoEndereco>();
-		senhaRepetida = null;
 		maskDtNascimento = null;
 		telFixo = new Telefone();
 		telCelular = new Telefone();
@@ -214,12 +212,21 @@ public class ClienteMB {
 		}
 	}
 	
-	public boolean validaSenha() {
-		String padrao = "(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+	public void validaSenha() {
+		String padrao = "(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,}";
 		if(cliente.getSenha().matches(padrao)) {
-			return true;
+			if(cliente.getSenha().equals(cliente.getSenhaRepetida())) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Senha válida!"));
+			} else {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Senha inválida! A senha deve ser igual nos dois campos"));
+			}
 		} else {
-			return false;
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "", " Senha inválida! A senha "
+							+ " deve ser composta de pelo menos 8 caracteres, ter letras maiúsculas e minúsculas"
+							+ " além de conter um dos seguintes caracteres especiais: !@#$%^&+=."));
 		}
 	}
 
@@ -233,7 +240,6 @@ public class ClienteMB {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		
 		// COMPONDO LISTA DE TELEFONES
 		cliente.setTelefones(null);
 		telefones = new ArrayList<Telefone>();
@@ -241,16 +247,11 @@ public class ClienteMB {
 		TipoTelefone tipoCel = new TipoTelefone();
 		tipoFixo.setId(EnumTelefone.FIXO.getValue());
 		tipoCel.setId(EnumTelefone.CELULAR.getValue());
-		if(telFixo.getNumero() != null && telFixo.getNumero() != 0) {
-			telFixo.setTipo(tipoFixo);
-			telefones.add(telFixo);
-		}
-		if(telCelular.getNumero() != null && telCelular.getNumero() != 0) {
-			telCelular.setTipo(tipoCel);
-			telefones.add(telCelular);
-		}
+		telFixo.setTipo(tipoFixo);
+		telefones.add(telFixo);
+		telCelular.setTipo(tipoCel);
+		telefones.add(telCelular);
 		cliente.setTelefones(telefones);
-		
 		// COMPONDO LISTA DE ENDEREÇOS
 		cliente.setEndCobranca(null);
 		cliente.setEnderecoResidencial(null);
@@ -266,52 +267,33 @@ public class ClienteMB {
 		tipoResidencial.setId(EnumEndereco.RESIDENCIAL.getValue());
 		cliente.setEnderecoResidencial(endereco);
 		cliente.getEnderecoResidencial().setTipo(tipoResidencial);
-		if (flgEndCobranca) {
-			TipoEndereco tipoCobranca = new TipoEndereco();
-			tipoCobranca.setId(EnumEndereco.COBRANCA.getValue());
-			endCobranca.setBairro(endereco.getBairro());
-			endCobranca.setCep(endereco.getCep());
-			endCobranca.setCidade(endereco.getCidade());
-			endCobranca.setLogradouro(endereco.getLogradouro());
-			endCobranca.setNumero(endereco.getNumero());
-			endCobranca.setObservacoes(endereco.getObservacoes());
-			endCobranca.setTipoLogradouro(endereco.getTipoLogradouro());
-			endCobranca.setTipoResidencia(endereco.getTipoResidencia());
-			endCobranca.setTitulo(endereco.getTitulo());
-			endCobranca.setTipo(tipoCobranca);
-			cliente.setEndCobranca(endCobranca);
-		}
-		if (flgEndEntrega) {
-			TipoEndereco tipoEntrega = new TipoEndereco();
-			tipoEntrega.setId(EnumEndereco.ENTREGA.getValue());
-			if (flgEndPreferencial) {
-				endPreferencial.setBairro(endereco.getBairro());
-				endPreferencial.setCep(endereco.getCep());
-				endPreferencial.setCidade(endereco.getCidade());
-				endPreferencial.setLogradouro(endereco.getLogradouro());
-				endPreferencial.setNumero(endereco.getNumero());
-				endPreferencial.setObservacoes(endereco.getObservacoes());
-				endPreferencial.setTipoLogradouro(endereco.getTipoLogradouro());
-				endPreferencial.setTipoResidencia(endereco.getTipoResidencia());
-				endPreferencial.setTitulo(endereco.getTitulo());
-				endPreferencial.setTipo(tipoEntrega);
-				enderecos.add(endPreferencial);
-				cliente.setEndPreferencial(endPreferencial);
-			} else {
-				endEntrega.setBairro(endereco.getBairro());
-				endEntrega.setCep(endereco.getCep());
-				endEntrega.setCidade(endereco.getCidade());
-				endEntrega.setLogradouro(endereco.getLogradouro());
-				endEntrega.setNumero(endereco.getNumero());
-				endEntrega.setObservacoes(endereco.getObservacoes());
-				endEntrega.setTipoLogradouro(endereco.getTipoLogradouro());
-				endEntrega.setTipoResidencia(endereco.getTipoResidencia());
-				endEntrega.setTitulo(endereco.getTitulo());
-				endEntrega.setTipo(tipoEntrega);
-				enderecos.add(endEntrega);
-			}
-			cliente.setEndsEntrega(enderecos);
-		}
+		TipoEndereco tipoCobranca = new TipoEndereco();
+		tipoCobranca.setId(EnumEndereco.COBRANCA.getValue());
+		endCobranca.setBairro(endereco.getBairro());
+		endCobranca.setCep(endereco.getCep());
+		endCobranca.setCidade(endereco.getCidade());
+		endCobranca.setLogradouro(endereco.getLogradouro());
+		endCobranca.setNumero(endereco.getNumero());
+		endCobranca.setObservacoes(endereco.getObservacoes());
+		endCobranca.setTipoLogradouro(endereco.getTipoLogradouro());
+		endCobranca.setTipoResidencia(endereco.getTipoResidencia());
+		endCobranca.setTitulo(endereco.getTitulo());
+		endCobranca.setTipo(tipoCobranca);
+		cliente.setEndCobranca(endCobranca);
+		TipoEndereco tipoEntrega = new TipoEndereco();
+		tipoEntrega.setId(EnumEndereco.ENTREGA.getValue());
+		endEntrega.setBairro(endereco.getBairro());
+		endEntrega.setCep(endereco.getCep());
+		endEntrega.setCidade(endereco.getCidade());
+		endEntrega.setLogradouro(endereco.getLogradouro());
+		endEntrega.setNumero(endereco.getNumero());
+		endEntrega.setObservacoes(endereco.getObservacoes());
+		endEntrega.setTipoLogradouro(endereco.getTipoLogradouro());
+		endEntrega.setTipoResidencia(endereco.getTipoResidencia());
+		endEntrega.setTitulo(endereco.getTitulo());
+		endEntrega.setTipo(tipoEntrega);
+		enderecos.add(endEntrega);
+		cliente.setEndsEntrega(enderecos);
 		
 		command = commands.get("SALVAR");
 		Resultado rs = command.execute(cliente);
@@ -625,14 +607,6 @@ public class ClienteMB {
 
 	public void setTiposEndereco(List<TipoEndereco> tiposEndereco) {
 		this.tiposEndereco = tiposEndereco;
-	}
-
-	public String getSenhaRepetida() {
-		return senhaRepetida;
-	}
-
-	public void setSenhaRepetida(String senhaRepetida) {
-		this.senhaRepetida = senhaRepetida;
 	}
 
 	public String getMaskDtNascimento() {

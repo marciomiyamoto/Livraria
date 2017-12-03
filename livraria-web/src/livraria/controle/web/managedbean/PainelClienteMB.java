@@ -25,6 +25,7 @@ import dominio.cliente.BandeiraCartao;
 import dominio.cliente.Cartao;
 import dominio.cliente.Cliente;
 import dominio.cliente.ClienteEnd;
+import dominio.cliente.EnumTipoCartao;
 import dominio.endereco.Cidade;
 import dominio.endereco.Endereco;
 import dominio.endereco.EnumEndereco;
@@ -412,6 +413,8 @@ public class PainelClienteMB {
 				Usuario usuario = new Usuario();
 				usuario.setId(cliente.getIdUsuario());
 				usuario.setSenha(senhaNova);
+				usuario.setSenhaRepetida(senhaRepetida);
+				usuario.setSenhaAntiga(senhaAntiga);
 				usuario.setUsuario(cliente.getUsuario());
 				
 				command = commands.get("ALTERAR");
@@ -479,6 +482,7 @@ public class PainelClienteMB {
 	public void cadastrarCartao() {
 		cartaoSalvar.setIdCliente(cliente.getId());
 		cartaoSalvar.setBandeira(bandeiraSalvar);
+		cartaoSalvar.setTipoCartao(EnumTipoCartao.CADASTRO_CLIENTE.getValue());
 		SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
 		try {
 			Date data = format.parse(maskDtVencimentoSalvar);
@@ -510,6 +514,7 @@ public class PainelClienteMB {
 	public void alterarCartao() {
 		cartao.setIdCliente(cliente.getId());
 		cartao.setBandeira(bandeira);
+		cartao.setTipoCartao(EnumTipoCartao.CADASTRO_CLIENTE.getValue());
 		SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
 		try {
 			Date data = format.parse(maskDtVencimento);

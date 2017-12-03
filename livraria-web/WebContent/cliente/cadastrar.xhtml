@@ -8,7 +8,7 @@
 <h:head></h:head>
 <h:body>
 	<h:form id="cadastrarCliente">
-		<p:growl id="growl" showDetail="true" life="8000" />
+		<p:growl id="growl" showDetail="true" life="15000" />
 		<p:link value="Buscar" outcome="buscar.xhtml" style="float:right;margin-right:10px;" />
 		<p:wizard id="wizCliente" backLabel="Voltar" nextLabel="Próximo" >
 			<p:tab id="cliente1" title="Dados de login">
@@ -44,9 +44,15 @@
 					</p:row>
 					<p:row>
 						<p:column>
-							<p:password value="#{clienteMB.senhaRepetida}"/>
+							<p:password value="#{clienteMB.cliente.senhaRepetida}"/>
 						</p:column>
 					</p:row>
+					<p:row>
+						<p:column>
+							<p:commandButton value="Validar" actionListener="#{clienteMB.validaSenha}" update="growl"/>
+						</p:column>
+					</p:row>
+					
 				</h:panelGrid>
 			</p:tab>
 			<p:tab id="cliente2" title="Dados pessoais">
@@ -235,20 +241,6 @@
 					</p:row>
 					<p:row>
 						<p:inputTextarea value="#{clienteMB.endereco.observacoes}" rows="2"/>
-					</p:row>
-					<p:row>
-						<p:selectBooleanCheckbox value="#{clienteMB.flgEndCobranca}" style="margin-right:10px;"/>
-						<h:outputText value="O endereço de cobrança é o mesmo"/>
-					</p:row>
-					<p:row>
-						<p:selectBooleanCheckbox value="#{clienteMB.flgEndEntrega}" style="margin-right:10px;" >
-							<p:ajax update="cadastrarCliente:pref" />
-						</p:selectBooleanCheckbox>
-						<h:outputText value="O endereço de entrega é o mesmo"/>
-					</p:row>
-					<p:row>
-						<p:selectBooleanCheckbox id="pref" value="#{clienteMB.flgEndPreferencial}" disabled="#{clienteMB.flgEndEntrega == false || clienteMB.flgEndEntrega == null}" style="margin-right:10px;"/>
-						<h:outputText value="Endereço preferencial"/>
 					</p:row>
 				</h:panelGrid>
 				<p:commandButton value="Cadastrar" actionListener="#{clienteMB.cadastrarCliente}" update="growl" style="margin-top:10px;" />

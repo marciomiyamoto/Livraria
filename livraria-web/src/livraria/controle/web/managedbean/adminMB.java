@@ -44,8 +44,6 @@ public class adminMB {
 		commands.put("CONSULTAR", new ConsultarCommand());
 		commands.put("VISUALIZAR", new VisualizarCommand());
 		commands.put("ALTERAR", new AlterarCommand());
-		
-		carregarPedidos();
 	}
 	
 	public void carregarPedidos() {

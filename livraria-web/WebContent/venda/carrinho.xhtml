@@ -15,7 +15,7 @@
 				</p:column>
 				<p:column headerText="Preço un.">
 					<h:outputText value="#{item.estoque.livro.precoVenda}">
-						<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+						<f:convertNumber pattern=".00" locale="pt_BR"/>
 					</h:outputText>
 				</p:column>
 				<p:column headerText="Qtde">
@@ -47,7 +47,7 @@
 						<p:row>
 							<p:column>
 								<h:outputText value="PAC: R$#{vendaMB.custoFretePAC.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 							<p:column>
@@ -58,7 +58,7 @@
 						<p:row>
 							<p:column>
 								<h:outputText value="Sedex: #{vendaMB.custoFreteSedex.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 							<p:column>
@@ -69,7 +69,7 @@
 						<p:row>
 							<p:column>
 								<h:outputText value="Sedex10: #{vendaMB.custoFreteSedex10.valor}">
-									<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+									<f:convertNumber pattern=".00" locale="pt_BR"/>
 								</h:outputText>
 							</p:column>
 							<p:column>
@@ -86,7 +86,7 @@
 				</p:column>
 				<p:column>
 					<h:outputText value="#{vendaMB.pedido.valorTotal}">
-						<f:convertNumber pattern="###,##.00" locale="pt_BR"/>
+						<f:convertNumber pattern=".00" locale="pt_BR"/>
 					</h:outputText>
 				</p:column>
 			</p:row>
