@@ -45,9 +45,7 @@ public class SubcategoriaDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		Subcategoria sub = (Subcategoria)entidade;
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
@@ -78,24 +76,32 @@ public class SubcategoriaDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return subcategorias;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
-			}
-		} finally {
+		} catch(SQLException e) {
 			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
 				e.printStackTrace();
 			}
-		} 
+		} finally {
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		return null;
 	}
 }

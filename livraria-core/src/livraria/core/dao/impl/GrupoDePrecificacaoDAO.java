@@ -43,9 +43,7 @@ public class GrupoDePrecificacaoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM GrupoDePrecificacao");
@@ -64,22 +62,30 @@ public class GrupoDePrecificacaoDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return grupos;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;

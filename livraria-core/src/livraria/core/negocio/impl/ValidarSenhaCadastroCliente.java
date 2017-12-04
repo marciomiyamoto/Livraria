@@ -13,9 +13,11 @@ public class ValidarSenhaCadastroCliente implements IStrategy {
 			// EXPRESSÃO REGULAR PARA VALIDAR A SENHA
 			String padrao = "(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,}";
 			// CASO A SENHA PASSE PELA VALIDAÇÃO DA EXPRESSÃO REGULAR
-			if(cliente.getSenha().matches(padrao)) {
+			if(cliente.getSenha() != null && cliente.getSenha() != "" &&
+					cliente.getSenha().matches(padrao)) {
 				// CASO AS SENHAS SEJAM IGUAIS
-				if(cliente.getSenha().equals(cliente.getSenhaRepetida())) {
+				if(cliente.getSenhaRepetida() != null && cliente.getSenhaRepetida() != "" && 
+						cliente.getSenha().equals(cliente.getSenhaRepetida())) {
 					return null;
 				} else {
 					return "Senha inválida! A senha deve ser igual nos dois campos";

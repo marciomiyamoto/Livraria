@@ -13,12 +13,7 @@ public class ConexaoOracle {
 	public static Connection getConnection() throws ClassNotFoundException, 
 	SQLException {
 		
-//		Connection conn = null;
-//		try {
-			Connection conn = DriverManager.getConnection(url, usuario, senha);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		Connection conn = DriverManager.getConnection(url, usuario, senha);
 		return conn;
 	}
 }

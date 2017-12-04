@@ -27,9 +27,7 @@ public class EstadoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Estado estado = (Estado)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -50,13 +48,21 @@ public class EstadoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				estado.setId(generatedKeys.getInt(1));
 			}
-			
+			generatedKeys.close();
 			connection.commit();
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -74,9 +80,7 @@ public class EstadoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Estado estado = (Estado)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -98,22 +102,29 @@ public class EstadoDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
 	}
 
 	@Override
@@ -124,9 +135,7 @@ public class EstadoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Estado estado = (Estado)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -160,22 +169,30 @@ public class EstadoDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return estados;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;

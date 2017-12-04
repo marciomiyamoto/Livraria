@@ -384,12 +384,17 @@ public class PainelClienteMB {
 	
 	public void alterarCliente() {
 		cliente.setUsuario(cliente.getEmail());
+		cliente.setSenhaRepetida(cliente.getSenha());
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		try {
-			Date data = format.parse(maskDtNascimento);
-			cliente.setDtNascimento(data);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if(maskDtNascimento != null && maskDtNascimento != "") {
+			try {
+				Date data = format.parse(maskDtNascimento);
+				cliente.setDtNascimento(data);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		} else {
+			cliente.setDtNascimento(null);
 		}
 		
 		command = commands.get("ALTERAR");
@@ -405,37 +410,35 @@ public class PainelClienteMB {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cliente alterado com sucesso!"));
 		}
+		maskDtNascimento = null;
 	}
 	
 	public void alterarSenha() {
-		if(senhaAntiga != null) {
-			if(senhaAntiga.equals(cliente.getSenha())) {
-				Usuario usuario = new Usuario();
-				usuario.setId(cliente.getIdUsuario());
-				usuario.setSenha(senhaNova);
-				usuario.setSenhaRepetida(senhaRepetida);
-				usuario.setSenhaAntiga(senhaAntiga);
-				usuario.setUsuario(cliente.getUsuario());
-				
-				command = commands.get("ALTERAR");
-				Resultado rs = command.execute(usuario);
-				if (rs.getMsg() != null) {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
-				} else {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Senha alterada com sucesso!"));
-				}
-			} else {
-				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Senha antiga inválida!"));
-			}
+		Cliente clienteTemp = new Cliente();
+		clienteTemp = cliente;
+		clienteTemp.setSenha(senhaNova);
+		clienteTemp.setSenhaRepetida(senhaRepetida);
+		clienteTemp.setSenhaAntiga(senhaAntiga);
+		
+		command = commands.get("ALTERAR");
+		Resultado rs = command.execute(clienteTemp);
+		if (rs.getMsg() != null) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Senha alterada com sucesso!"));
 		}
+		senhaAntiga = null;
+		senhaNova = null;
+		senhaRepetida = null;
 	}
 	
 	public void ativarCliente() {
 		if(!cliente.getAtivo()) {
 			cliente.setAtivo(true);
+			cliente.setSenhaRepetida(cliente.getSenha());
+			cliente.setSenhaAntiga(cliente.getSenha());
 			
 			command = commands.get("ALTERAR");
 			Resultado rs = command.execute(cliente);
@@ -459,6 +462,8 @@ public class PainelClienteMB {
 	public void inativarCliente() {
 		if(cliente.getAtivo()) {
 			cliente.setAtivo(false);
+			cliente.setSenhaRepetida(cliente.getSenha());
+			cliente.setSenhaAntiga(cliente.getSenha());
 			
 			command = commands.get("ALTERAR");
 			Resultado rs = command.execute(cliente);
@@ -471,7 +476,7 @@ public class PainelClienteMB {
 				rs = command.execute(cliente);
 				cliente = (Cliente)rs.getEntidades().get(0);
 				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cliente ativado com sucesso!"));
+						new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cliente inativado com sucesso!"));
 			}
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null,

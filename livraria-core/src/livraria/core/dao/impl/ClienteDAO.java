@@ -16,6 +16,7 @@ import dominio.TipoTelefone;
 import dominio.Usuario;
 import dominio.cliente.Cartao;
 import dominio.cliente.Cliente;
+import dominio.cliente.EnumTipoCartao;
 import dominio.endereco.Cidade;
 import dominio.endereco.Endereco;
 import dominio.endereco.EnumEndereco;
@@ -39,9 +40,7 @@ public class ClienteDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed() ) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Cliente cliente = (Cliente)entidade;
 		EnderecoDAO endDAO = new EnderecoDAO();
@@ -61,15 +60,9 @@ public class ClienteDAO extends AbstractJdbcDAO {
 		
 		// SALVANDO ENDEREÇOS DE ENTREGA ASSOCIADOS COM CLIENTE
 		if(cliente.getEndsEntrega() != null) {
-			// SALVANDO ENDEREÇO PREFERENCIAL
-			if(cliente.getEndPreferencial() != null) {
+			for(Endereco end : cliente.getEndsEntrega()) {
 				endDAO.ctrlTransacao = false;
-				endDAO.salvar(cliente.getEndPreferencial());
-			} else {
-				for(Endereco end : cliente.getEndsEntrega()) {
-					endDAO.ctrlTransacao = false;
-					endDAO.salvar(end);
-				}
+				endDAO.salvar(end);
 			}
 		}
 		
@@ -120,7 +113,7 @@ public class ClienteDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				cliente.setId(generatedKeys.getInt(1));
 			}
-			
+			generatedKeys.close();
 			connection.commit();
 			// ASSOCIANDO CLIENTE COM ENDEREÇOS NA TABELA CLIENTE_END
 			if(cliente.getEndsEntrega() != null) {
@@ -145,8 +138,16 @@ public class ClienteDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -179,15 +180,23 @@ public class ClienteDAO extends AbstractJdbcDAO {
 			pst.setInt(2, end.getId());
 			
 			pst.executeUpdate();
+			pst.close();
 			connection.commit();
 		}catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException el) {
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
-		}
+		} 
 	}
 	private void salvarClienteTel(Cliente cli, Telefone tel) {
 		
@@ -206,22 +215,28 @@ public class ClienteDAO extends AbstractJdbcDAO {
 			pst.setInt(2, tel.getId());
 			
 			pst.executeUpdate();
+			pst.close();
 			connection.commit();
-		}catch(SQLException e) {
+		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException el) {
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
-		}
+		} 
 	}
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Cliente cliente = (Cliente)entidade;
 		Usuario usuario = new Usuario();
@@ -278,22 +293,29 @@ public class ClienteDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
 	}
 
 	@Override
@@ -304,9 +326,7 @@ public class ClienteDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Cliente cli = (Cliente)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -422,7 +442,7 @@ public class ClienteDAO extends AbstractJdbcDAO {
 				CartaoDAO car = new CartaoDAO();
 				Cartao cartao = new Cartao();
 				cartao.setIdCliente(cliente.getId());
-				car.ctrlTransacao = false;
+				cartao.setTipoCartao(EnumTipoCartao.CADASTRO_CLIENTE.getValue());
 				List<Cartao> cartoes = (List<Cartao>)(List<?>)car.consultar(cartao);
 				int idCartaoPref = rs.getInt("id_cartaoPreferencial");
 				for(Cartao c : cartoes) {
@@ -455,33 +475,37 @@ public class ClienteDAO extends AbstractJdbcDAO {
 				clientes = (List<EntidadeDominio>)(List<?>)cliList.stream().distinct().collect(Collectors.toList());
 			}
 			return clientes;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			if(ctrlTransacao) {
 				try {
-					pst.close();
-					if(ctrlTransacao)
+					if(pst != null) {
+						pst.close();
+					}
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
 			}
-		}
 		return null;
 	}
 	
 	public List<Telefone> buscarTelefones(int idCliente) {
-		if(connection == null) {
-			abrirConexao();
-		}
+		
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT t.id, t.dtCadastro, t.ddd, t.numero, ");
@@ -510,25 +534,29 @@ public class ClienteDAO extends AbstractJdbcDAO {
 				tel.setTipo(tipo);
 				telefones.add(tel);
 			}
+			pst.close();
 			rs.close();
 			return telefones;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-		}
+		} 
 		return null;
 	}
 	
 	public List<Endereco> buscarEnderecos(int idCliente) {
-		if(connection == null) {
-			abrirConexao();
-		}
+		
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT e.id AS id, e.dtCadastro AS dtCadastro, e.logradouro AS logradouro, ");
@@ -590,18 +618,24 @@ public class ClienteDAO extends AbstractJdbcDAO {
 				
 				enderecos.add(end);
 			}
+			pst.close();
 			rs.close();
 			return enderecos;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-		}
+		} 
 		return null;
 	}
 

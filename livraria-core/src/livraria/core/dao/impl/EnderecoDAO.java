@@ -30,9 +30,7 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Endereco endereco = (Endereco)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -74,13 +72,21 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				endereco.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
-			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -98,9 +104,7 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Endereco endereco = (Endereco) entidade;
 		StringBuilder sql = new StringBuilder();
@@ -140,22 +144,29 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
 	}
 
 	@Override
@@ -166,9 +177,7 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Endereco endereco = (Endereco) entidade;
 		StringBuilder sql = new StringBuilder();
@@ -180,7 +189,6 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 		sql.append("pa.id AS pa_id, pa.dtCadastro AS pa_dtCadastro, pa.nome AS pais, ");
 		sql.append("te.id AS te_id, te.dtCadastro AS te_dtCadastro, te.nome AS tipoResidencia ");
 		sql.append("FROM  endereco e ");
-//		sql.append("JOIN cliente_end ce ON e.id = ce.id_endereco ");
 		sql.append("JOIN cidade ci ON ci.id = e.id_cidade ");
 		sql.append("JOIN estado es ON es.id = e.id_estado ");
 		sql.append("JOIN pais pa ON pa.id = e.id_pais ");
@@ -241,20 +249,28 @@ public class EnderecoDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return enderecos;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			try {
-				pst.close();
-				if(ctrlTransacao)
+				if(pst != null) {
+					pst.close();
+				}
+				if(ctrlTransacao) {
 					connection.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}

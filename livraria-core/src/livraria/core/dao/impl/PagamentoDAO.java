@@ -29,9 +29,7 @@ public class PagamentoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Pagamento pagamento = (Pagamento)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -63,13 +61,21 @@ public class PagamentoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				pagamento.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
-			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -87,44 +93,6 @@ public class PagamentoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-//		if(connection == null) {
-//			abrirConexao();
-//		}
-//		PreparedStatement pst = null;
-//		Genero genero = (Genero)entidade;
-//		StringBuilder sql = new StringBuilder();
-//		
-//		sql.append("UPDATE Genero SET ");
-//		sql.append("nome = ? ");
-//		sql.append("WHERE id = ?");
-//		try {
-//			connection.setAutoCommit(false);
-//			
-//			pst = connection.prepareStatement(sql.toString());
-//			pst.setString(1, genero.getNome());
-//			pst.setInt(2, genero.getId());
-//			
-//			pst.executeUpdate();
-//			connection.commit();
-//		} catch(SQLException e) {
-//			try {
-//				connection.rollback();
-//			} catch(SQLException e1) {
-//				e1.printStackTrace();
-//			}
-//			e.printStackTrace();
-//		} finally {
-//			if(ctrlTransacao) {
-//				try {
-//					pst.close();
-//					if(ctrlTransacao)
-//						connection.close();
-//				} catch(SQLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		
 	}
 
 	@Override
@@ -135,9 +103,7 @@ public class PagamentoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		Pagamento pagamento = (Pagamento)entidade;
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
@@ -180,14 +146,12 @@ public class PagamentoDAO extends AbstractJdbcDAO {
 				
 				cartao.setId(rs.getInt("id_cartao"));
 				if(cartao.getId() != null) {
-					cartDao.ctrlTransacao = false;
 					cartao = (Cartao)cartDao.consultar(cartao).get(0);
 					formaPgto.setCartao(cartao);
 				}
 				
 				cupom.setId(rs.getInt("id_cupomTroca"));
 				if(cupom.getId() != null && cupom.getId() != 0) {
-					cupomDao.ctrlTransacao = false;
 					cupom = (CupomTroca)cupomDao.consultar(cupom).get(0);
 					formaPgto.setCupomTroca(cupom);
 				}
@@ -197,20 +161,28 @@ public class PagamentoDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return pagamentos;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			try {
-				pst.close();
-				if(ctrlTransacao)
+				if(pst != null) {
+					pst.close();
+				}
+				if(ctrlTransacao) {
 					connection.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}

@@ -16,7 +16,7 @@ public class ValidarDadosObrigatoriosCliente implements IStrategy {
 					cliente.getEndCobranca() != null && cliente.getEndsEntrega() != null && cliente.getEnderecoResidencial() != null &&
 					cliente.getGenero() != null &&cliente.getNome() != null && cliente.getTelefones() != null && cliente.getSenha() != null) {
 				// VERIFICA SE TODOS OS DADOS OBRIGATÓRIOS DE CLIENTE ESTÃO PREENCHIDOS
-				if(cliente.getCpf() != 0 && cliente.getDtNascimento() != null && cliente.getEmail() != "" &&
+				if(cliente.getCpf() != 0 && cliente.getDtNascimento().getTime() != 0 && cliente.getEmail() != "" &&
 						cliente.getGenero().getNome() != "" &&cliente.getNome() != "" && cliente.getSenha() != "") {
 					// VERIFICA TODOS OS DADOS OBRIGATÓRIOS DOS ENDEREÇOS
 					ValidarDadosObrigatoriosEndereco vEnd = new ValidarDadosObrigatoriosEndereco();

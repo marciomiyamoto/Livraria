@@ -32,9 +32,7 @@ public class LivroDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Livro livro = (Livro)entidade;
 		Autor autor = livro.getAutor();
@@ -54,9 +52,6 @@ public class LivroDAO extends AbstractJdbcDAO {
 		autDAO.salvar(autor);
 		
 		// SALVANDO LIVRO
-		if(connection == null) {
-			abrirConexao();
-		}
 		sql.append("INSERT INTO Livro");
 		sql.append("(titulo,  ");
 		sql.append("ano,  ");
@@ -96,6 +91,7 @@ public class LivroDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				livro.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
 			// SALVANDO LIVRO_CATEGORIA
 			for(Categoria cat : livro.getCategorias()) {
@@ -113,8 +109,16 @@ public class LivroDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException el) {
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -148,15 +152,23 @@ public class LivroDAO extends AbstractJdbcDAO {
 			pst.setInt(2, subcat.getId());
 			
 			pst.executeUpdate();
+			pst.close();
 			connection.commit();
-		}catch(SQLException e) {
+		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException el) {
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
-		}
+		} 
 	}
 
 	private void salvarCategoria(Livro livro, Categoria cat) {
@@ -176,22 +188,28 @@ public class LivroDAO extends AbstractJdbcDAO {
 			pst.setInt(2, cat.getId());
 			
 			pst.executeUpdate();
+			pst.close();
 			connection.commit();
-		}catch(SQLException e) {
+		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException el) {
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
-		}
+		} 
 	}
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Livro livro = (Livro) entidade;
 		Autor autor = livro.getAutor();
@@ -205,7 +223,7 @@ public class LivroDAO extends AbstractJdbcDAO {
 		dimDAO.alterar(dimensoes);
 		
 		// SALVANDO AUTOR
-		autDAO.ctrlTransacao = false;
+		autDAO.ctrlTransacao =false;
 		autDAO.alterar(autor);
 		
 		// SALVANDO LIVRO
@@ -259,16 +277,24 @@ public class LivroDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
@@ -278,9 +304,7 @@ public class LivroDAO extends AbstractJdbcDAO {
 	
 	@Override
 	public void excluir(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Livro livro = (Livro) entidade;
 		StringBuilder sql = new StringBuilder();
@@ -314,16 +338,24 @@ public class LivroDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
@@ -342,14 +374,22 @@ public class LivroDAO extends AbstractJdbcDAO {
 			pst.setInt(1, livro.getId());
 			
 			pst.executeUpdate();
+			pst.close();
 			connection.commit();
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} 
 	}
 	private void excluirSubcategorias(Livro livro) {
@@ -363,14 +403,22 @@ public class LivroDAO extends AbstractJdbcDAO {
 			pst.setInt(1, livro.getId());
 			
 			pst.executeUpdate();
+			pst.close();
 			connection.commit();
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} 
 	}
 
@@ -382,9 +430,7 @@ public class LivroDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Livro filtro = (Livro)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -583,31 +629,37 @@ public class LivroDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return livros;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;
 	}
 	
 	public List<Categoria> buscarCategoriasLivro(int idLivro) {
-		if(connection == null) {
-			abrirConexao();
-		}
+		
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT c.id, c.dtCadastro, c.nome, c.tipo ");
@@ -628,24 +680,28 @@ public class LivroDAO extends AbstractJdbcDAO {
 				cat.setTipo(rs.getString("tipo"));
 				categorias.add(cat);
 			}
+			pst.close();
 			rs.close();
 			return categorias;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-		}
+		} 
 		return null;
 	}
 	public List<Subcategoria> buscarSubcategoriasLivro(int idLivro) {
-		if(connection == null) {
-			abrirConexao();
-		}
+		
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT s.id as id, s.dtCadastro as dtCadastro, s.nome as nome ");
@@ -665,19 +721,24 @@ public class LivroDAO extends AbstractJdbcDAO {
 				subcat.setNome(rs.getString("nome"));
 				subcategorias.add(subcat);
 			}
+			pst.close();
 			rs.close();
 			return subcategorias;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-		}
+		} 
 		return null;
 	}
-
 }

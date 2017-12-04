@@ -47,8 +47,10 @@ public class adminMB {
 	}
 	
 	public void carregarPedidos() {
+		Pedido pedido = new Pedido();
+		List<Pedido> pedidos = new ArrayList<Pedido>();
 		command = commands.get("CONSULTAR");
-		Resultado rs = command.execute(pedidoSelecionado);
+		Resultado rs = command.execute(pedido);
 
 		for (int i = 0; i < rs.getEntidades().size(); i++) {
 			try {
@@ -57,6 +59,8 @@ public class adminMB {
 				e.printStackTrace();
 			}
 		}
+		this.pedidos = pedidos;
+		pedidos = null;
 	}
 	
 	public void atualizarPedido() {

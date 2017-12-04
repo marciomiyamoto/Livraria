@@ -28,9 +28,7 @@ public class RegistroDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Registro registro = (Registro)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -62,13 +60,22 @@ public class RegistroDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				registro.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
 			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -86,46 +93,6 @@ public class RegistroDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-//		if(connection == null) {
-//			abrirConexao();
-//		}
-//		PreparedStatement pst = null;
-//		Estado estado = (Estado)entidade;
-//		StringBuilder sql = new StringBuilder();
-//		
-//		sql.append("UPDATE Estado SET ");
-//		sql.append("nome = ?, ");
-//		sql.append("id_pais = ? ");
-//		sql.append("WHERE id = ?");
-//		try {
-//			connection.setAutoCommit(false);
-//			
-//			pst = connection.prepareStatement(sql.toString());
-//			pst.setString(1, estado.getNome());
-//			pst.setInt(2, estado.getPais().getId());
-//			pst.setInt(2, estado.getId());
-//			
-//			pst.executeUpdate();
-//			connection.commit();
-//		} catch(SQLException e) {
-//			try {
-//				connection.rollback();
-//			} catch(SQLException e1) {
-//				e1.printStackTrace();
-//			}
-//			e.printStackTrace();
-//		} finally {
-//			if(ctrlTransacao) {
-//				try {
-//					pst.close();
-//					if(ctrlTransacao)
-//						connection.close();
-//				} catch(SQLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		
 	}
 
 	@Override
@@ -136,9 +103,7 @@ public class RegistroDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Registro registro = (Registro)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -173,22 +138,30 @@ public class RegistroDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return registros;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;

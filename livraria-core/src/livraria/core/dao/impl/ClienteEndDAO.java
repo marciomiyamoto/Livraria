@@ -26,9 +26,7 @@ public class ClienteEndDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		ClienteEnd cliEnd = (ClienteEnd)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -50,8 +48,16 @@ public class ClienteEndDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -69,51 +75,12 @@ public class ClienteEndDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null) {
-			abrirConexao();
-		}
-		PreparedStatement pst = null;
-		Autor autor = (Autor) entidade;
-		StringBuilder sql = new StringBuilder();
-		
-		sql.append("UPDATE Autor SET ");
-		sql.append("nome = ? ");
-		sql.append("WHERE id = ?");
-		try {
-			connection.setAutoCommit(false);
-			
-			pst = connection.prepareStatement(sql.toString());
-			pst.setString(1, autor.getNome());
-			pst.setInt(2, autor.getId());
-			
-			pst.executeUpdate();
-			connection.commit();
-		} catch(SQLException e) {
-			try {
-				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
-			}
-			e.printStackTrace();
-		} finally {
-			if(ctrlTransacao) {
-				try {
-					pst.close();
-					if(ctrlTransacao)
-						connection.close();
-				} catch(SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 		
 	}
 	
 	@Override
 	public void excluir(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		ClienteEnd cliEnd = (ClienteEnd)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -135,22 +102,30 @@ public class ClienteEndDAO extends AbstractJdbcDAO {
 			
 			pst.executeUpdate();
 			connection.commit();
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -163,44 +138,7 @@ public class ClienteEndDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
-		PreparedStatement pst = null;
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM Autor");
 		
-		try {
-			pst = connection.prepareStatement(sql.toString());			
-			ResultSet rs = pst.executeQuery();
-			List<EntidadeDominio> autores = new ArrayList<EntidadeDominio>()	;
-			while(rs.next() ) {
-				Autor autor = new Autor();
-				autor.setId(rs.getInt("id"));
-				autor.setDtCadastro(rs.getDate("dtCadastro"));
-				autor.setNome(rs.getString("nome"));
-				autores.add(autor);
-			}
-			rs.close();
-			return autores;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
-			}
-		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
-			}
-		}
 		return null;
 	}
 }

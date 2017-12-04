@@ -27,9 +27,7 @@ public class CartaoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Cartao cartao = (Cartao)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -40,8 +38,9 @@ public class CartaoDAO extends AbstractJdbcDAO {
 		sql.append("codSeguranca, ");
 		sql.append("dtVencimento,  ");
 		sql.append("id_bandeira, ");
-		sql.append("id_cliente) ");
-		sql.append("VALUES(?,?,?,?,?,?)");
+		sql.append("id_cliente, ");
+		sql.append("tipoCartao) ");
+		sql.append("VALUES(?,?,?,?,?,?,?)");
 		
 		try {
 			connection.setAutoCommit(false);
@@ -53,19 +52,29 @@ public class CartaoDAO extends AbstractJdbcDAO {
 			pst.setDate(4, new java.sql.Date(cartao.getDtVencimento().getTime()));
 			pst.setInt(5, cartao.getBandeira().getId());
 			pst.setInt(6, cartao.getIdCliente());
+			pst.setInt(7, cartao.getTipoCartao());
 			
 			pst.executeUpdate();
 			ResultSet generatedKeys = pst.getGeneratedKeys();
 			if(null != generatedKeys && generatedKeys.next()) {
 				cartao.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
 			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -83,9 +92,7 @@ public class CartaoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Cartao cartao = (Cartao) entidade;
 		StringBuilder sql = new StringBuilder();
@@ -95,7 +102,8 @@ public class CartaoDAO extends AbstractJdbcDAO {
 		sql.append("nomeImpresso = ?, ");
 		sql.append("codSeguranca = ?, ");
 		sql.append("dtVencimento = ?, ");
-		sql.append("id_bandeira = ? ");
+		sql.append("id_bandeira = ?, ");
+		sql.append("tipoCartao = ? ");
 		sql.append("WHERE id = ?");
 		try {
 			connection.setAutoCommit(false);
@@ -106,29 +114,37 @@ public class CartaoDAO extends AbstractJdbcDAO {
 			pst.setInt(3, cartao.getCodSeguranca());
 			pst.setDate(4, new java.sql.Date(cartao.getDtVencimento().getTime()));
 			pst.setInt(5, cartao.getBandeira().getId());
-			pst.setInt(6, cartao.getId());
+			pst.setInt(6, cartao.getTipoCartao());
+			pst.setInt(7, cartao.getId());
 			
 			pst.executeUpdate();
 			connection.commit();
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
 	}
 
 	@Override
@@ -139,13 +155,11 @@ public class CartaoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Cartao cartao = (Cartao)entidade;
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT c.id, c.dtCadastro, c.numero, c.nomeimpresso, c.codseguranca, c.dtVencimento, c.id_cliente as id_cliente, ");
+		sql.append("SELECT c.id, c.dtCadastro, c.numero, c.nomeimpresso, c.codseguranca, c.dtVencimento, c.id_cliente as id_cliente, c.tipoCartao as tipoCartao, ");
 		sql.append("b.id AS b_id, b.dtCadastro AS b_dtCadastro, b.bin AS bin, b.nome AS bandeira ");
 		sql.append("FROM cartao c ");
 		sql.append("JOIN BANDEIRACARTAO b ON b.id = c.ID_BANDEIRA ");
@@ -155,7 +169,10 @@ public class CartaoDAO extends AbstractJdbcDAO {
 			sql.append("AND c.id = ? ");
 		}
 		if(cartao.getIdCliente() != null && cartao.getIdCliente() != 0) {
-			sql.append("AND c.id_cliente = ?");
+			sql.append("AND c.id_cliente = ? ");
+		}
+		if(cartao.getTipoCartao() != null && cartao.getTipoCartao() != 0) {
+			sql.append("AND c.tipoCartao = ? ");
 		}
 		
 		try {
@@ -164,9 +181,15 @@ public class CartaoDAO extends AbstractJdbcDAO {
 			
 			if(cartao.getId() != null && cartao.getId() != 0) {
 				pst.setInt(i, cartao.getId());
+				i++;
 			}
 			if(cartao.getIdCliente() != null && cartao.getIdCliente() != 0) {
 				pst.setInt(i, cartao.getIdCliente());
+				i++;
+			}
+			if(cartao.getTipoCartao() != null && cartao.getTipoCartao() != 0) {
+				pst.setInt(i, cartao.getTipoCartao());
+				i++;
 			}
 			ResultSet rs = pst.executeQuery();
 			List<EntidadeDominio> cartoes = new ArrayList<EntidadeDominio>()	;
@@ -187,26 +210,33 @@ public class CartaoDAO extends AbstractJdbcDAO {
 				cartao.setDtVencimento(rs.getDate("dtVencimento"));
 				cartao.setBandeira(bandeira);
 				cartao.setIdCliente(rs.getInt("id_cliente"));
+				cartao.setTipoCartao(rs.getInt("tipoCartao"));
 				
 				cartoes.add(cartao);
 			}
 			rs.close();
 			return cartoes;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}

@@ -234,11 +234,13 @@ public class ClienteMB {
 		cliente.setUsuario(cliente.getEmail());
 		cliente.setGenero(generoSelecionado);
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		try {
-			Date data = format.parse(maskDtNascimento);
-			cliente.setDtNascimento(data);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if(maskDtNascimento != null && maskDtNascimento != "") {
+			try {
+				Date data = format.parse(maskDtNascimento);
+				cliente.setDtNascimento(data);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		// COMPONDO LISTA DE TELEFONES
 		cliente.setTelefones(null);
@@ -259,6 +261,8 @@ public class ClienteMB {
 		cliente.setEndsEntrega(null);
 		endCobranca = new Endereco();
 		endEntrega = new Endereco();
+		Endereco endEntrega = new Endereco();
+		List<Endereco> ends = new ArrayList<Endereco>();
 		endPreferencial = new Endereco();
 		endereco.setCidade(cidadeSelecionada);
 		endereco.getCidade().setEstado(estadoSelecionado);
@@ -292,8 +296,8 @@ public class ClienteMB {
 		endEntrega.setTipoResidencia(endereco.getTipoResidencia());
 		endEntrega.setTitulo(endereco.getTitulo());
 		endEntrega.setTipo(tipoEntrega);
-		enderecos.add(endEntrega);
-		cliente.setEndsEntrega(enderecos);
+		ends.add(endEntrega);
+		cliente.setEndsEntrega(ends);
 		
 		command = commands.get("SALVAR");
 		Resultado rs = command.execute(cliente);

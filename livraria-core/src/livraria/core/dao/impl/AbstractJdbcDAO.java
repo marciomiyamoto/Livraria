@@ -64,7 +64,12 @@ public abstract class AbstractJdbcDAO implements IDAO {
 	protected void abrirConexao() {
 		try {
 			if(connection == null || connection.isClosed() ) {
-				connection = ConexaoOracle.getConnection();
+				try {
+					connection = ConexaoOracle.getConnection();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		} catch(SQLException e) {
 			e.printStackTrace();

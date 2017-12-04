@@ -33,9 +33,7 @@ public class PedidoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Pedido pedido = (Pedido)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -86,6 +84,7 @@ public class PedidoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				pedido.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
 			
 			// SALVANDO LISTA DE ITENS PEDIDO
@@ -115,8 +114,16 @@ public class PedidoDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -134,9 +141,7 @@ public class PedidoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		Pedido pedido = (Pedido)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -156,16 +161,24 @@ public class PedidoDAO extends AbstractJdbcDAO {
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch(SQLException e1) {
-				e1.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		} finally {
 			if(ctrlTransacao) {
 				try {
 					pst.close();
-					if(ctrlTransacao)
+					if(ctrlTransacao) {
 						connection.close();
+					}
 				} catch(SQLException e) {
 					e.printStackTrace();
 				}
@@ -181,9 +194,7 @@ public class PedidoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		Pedido pedido = (Pedido)entidade;
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
@@ -230,38 +241,31 @@ public class PedidoDAO extends AbstractJdbcDAO {
 				pedido.setValorTotalComDescontos(rs.getDouble("valorTotalComDescontos"));
 				
 				cliente.setId(rs.getInt("id_cliente"));
-				cliDao.ctrlTransacao = false;
 				cliente = (Cliente)cliDao.consultar(cliente).get(0);
 				pedido.setCliente(cliente);
 				
 				end.setId(rs.getInt("id_endEntrega"));
-				endDao.ctrlTransacao = false;
 				end = (Endereco)endDao.consultar(end).get(0);
 				pedido.setEndEntrega(end);
 				
 				custoFrete.setId(rs.getInt("id_frete"));
-				custoFreDao.ctrlTransacao = false;
 				custoFrete = (CustoFrete)custoFreDao.consultar(custoFrete).get(0);
 				pedido.setCustoFrete(custoFrete);
 				
 				pgto.setIdPedido(pedido.getId());
-				pgtoDao.ctrlTransacao = false;
 				pgtos = (List<Pagamento>)(List<?>)pgtoDao.consultar(pgto);
 				pedido.setPagamentos(pgtos);
 				
 				itemPedido.setIdPedido(pedido.getId());
-				itemPedDao.ctrlTransacao = false;
 				itensPedido = (List<ItemPedido>)(List<?>)itemPedDao.consultar(itemPedido);
 				pedido.setItens(itensPedido);
 				
 				itemBloqueio.setIdPedido(pedido.getId());
-				itemBloqDao.ctrlTransacao = false;
 				itensBloq = (List<ItemBloqueioPedido>)(List<?>)itemBloqDao.consultar(itemBloqueio);
 				pedido.setItensBloqueados(itensBloq);
 				
 				cupomPromo.setId(rs.getInt("id_cupomPromocional"));
 				if(cupomPromo.getId() != null && cupomPromo.getId() != 0) {
-					cupomPromoDao.ctrlTransacao = false;
 					cupomPromo = (CupomPromocional)cupomPromoDao.consultar(cupomPromo).get(0);
 					pedido.setCupomPromocional(cupomPromo);
 				}
@@ -270,22 +274,30 @@ public class PedidoDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return pedidos;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
-			try {
-				pst.close();
-				if(ctrlTransacao)
-					connection.close();
-			} catch(SQLException e) {
-				e.printStackTrace();
+			if(ctrlTransacao) {
+				try {
+					pst.close();
+					if(ctrlTransacao) {
+						connection.close();
+					}
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;

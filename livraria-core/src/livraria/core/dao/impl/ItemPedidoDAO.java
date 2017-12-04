@@ -26,9 +26,7 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 	}
 	@Override
 	public void salvar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		PreparedStatement pst = null;
 		ItemPedido item = (ItemPedido)entidade;
 		StringBuilder sql = new StringBuilder();
@@ -51,13 +49,21 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 			if(null != generatedKeys && generatedKeys.next()) {
 				item.setId(generatedKeys.getInt(1));
 			}
+			generatedKeys.close();
 			connection.commit();
-			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
-			} catch (SQLException el){
-				el.printStackTrace();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			if(ctrlTransacao) {
@@ -75,44 +81,6 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public void alterar(EntidadeDominio entidade) throws SQLException {
-//		if(connection == null) {
-//			abrirConexao();
-//		}
-//		PreparedStatement pst = null;
-//		Genero genero = (Genero)entidade;
-//		StringBuilder sql = new StringBuilder();
-//		
-//		sql.append("UPDATE Genero SET ");
-//		sql.append("nome = ? ");
-//		sql.append("WHERE id = ?");
-//		try {
-//			connection.setAutoCommit(false);
-//			
-//			pst = connection.prepareStatement(sql.toString());
-//			pst.setString(1, genero.getNome());
-//			pst.setInt(2, genero.getId());
-//			
-//			pst.executeUpdate();
-//			connection.commit();
-//		} catch(SQLException e) {
-//			try {
-//				connection.rollback();
-//			} catch(SQLException e1) {
-//				e1.printStackTrace();
-//			}
-//			e.printStackTrace();
-//		} finally {
-//			if(ctrlTransacao) {
-//				try {
-//					pst.close();
-//					if(ctrlTransacao)
-//						connection.close();
-//				} catch(SQLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		
 	}
 
 	@Override
@@ -123,9 +91,7 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 
 	@Override
 	public List<EntidadeDominio> consultar(EntidadeDominio entidade) throws SQLException {
-		if(connection == null || connection.isClosed()) {
-			abrirConexao();
-		}
+		abrirConexao();
 		ItemPedido item = (ItemPedido)entidade;
 		PreparedStatement pst = null;
 		StringBuilder sql = new StringBuilder();
@@ -157,7 +123,6 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 				item.setQtde(rs.getInt("qtde"));
 				item.setValorUnitario(rs.getDouble("valorUnitario"));
 				
-				estDao.ctrlTransacao = false;
 				estoque.setId(rs.getInt("id_estoque"));
 				estoque = (Estoque)estDao.consultar(estoque).get(0);
 				item.setEstoque(estoque);
@@ -166,25 +131,32 @@ public class ItemPedidoDAO extends AbstractJdbcDAO {
 			}
 			rs.close();
 			return itens;
-		} catch (SQLException ex) {
-			System.out.println("\n--- SQLException ---\n");
-			while( ex != null ) {
-				System.out.println("Mensagem: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("ErrorCode: " + ex.getErrorCode());
-				ex = ex.getNextException();
-				System.out.println("");
+		} catch(SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				System.out.println("\n--- SQLException ---\n");
+				while( ex != null ) {
+					System.out.println("Mensagem: " + ex.getMessage());
+					System.out.println("SQLState: " + ex.getSQLState());
+					System.out.println("ErrorCode: " + ex.getErrorCode());
+					ex = ex.getNextException();
+					System.out.println("");
+				}
+				e.printStackTrace();
 			}
 		} finally {
 			try {
-				pst.close();
-				if(ctrlTransacao)
+				if(pst != null) {
+					pst.close();
+				}
+				if(ctrlTransacao) {
 					connection.close();
+				}
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		return null;
 	}
-
 }
