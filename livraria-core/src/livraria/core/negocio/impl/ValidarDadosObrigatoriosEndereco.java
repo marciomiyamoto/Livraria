@@ -12,7 +12,8 @@ public class ValidarDadosObrigatoriosEndereco implements IStrategy {
 			Endereco endereco = (Endereco)entidade;
 			// VERIFICA SE TODOS OS CAMPOS OBRIGATÓRIOS ESTÃO DIFERENTES DE NULL
 			if(endereco.getTipo() != null && endereco.getBairro() != null && endereco.getCep() != null &&
-					endereco.getCidade() != null && endereco.getCidade().getEstado() != null && endereco.getCidade().getEstado().getPais() != null &&
+					endereco.getCidade().getId() != null && endereco.getCidade().getEstado().getId() != null && 
+					endereco.getCidade().getEstado().getPais().getId() != null &&
 					endereco.getLogradouro() != null && endereco.getNumero() != null && endereco.getTipoLogradouro() != null && 
 					endereco.getTipoResidencia() != null && endereco.getTitulo() != null) {
 				// VERIFICA SE TODOS OS CAMPOS OBRIGATÓRIOS ESTÃO PREENCHIDOS

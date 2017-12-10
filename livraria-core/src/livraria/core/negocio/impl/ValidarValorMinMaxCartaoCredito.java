@@ -1,5 +1,7 @@
 package livraria.core.negocio.impl;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,10 @@ public class ValidarValorMinMaxCartaoCredito implements IStrategy {
 					for(Pagamento p : pagamentos) {
 						valorPgtos += p.getValor();
 					}
+					DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+					symbols.setDecimalSeparator('.');
+					DecimalFormat df = new DecimalFormat("#.00", symbols); 
+					valorPgtos = Double.parseDouble(df.format(valorPgtos));
 					if(valorPgtos != pedido.getValorTotalComDescontos()) {
 						return "Pagamento com valor inválido";
 					}

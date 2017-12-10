@@ -11,11 +11,11 @@ public class ValidarDadosObrigatoriosCartao implements IStrategy {
 		if(entidade instanceof Cartao) {
 			Cartao cartao = (Cartao)entidade;
 			// VERIFICA SE TODOS OS DADOS OBRIGATÓRIOS DE CARTÃO ESTÃO DIFERENTES DE NULL
-			if(cartao.getBandeira() != null && cartao.getCodSeguranca() != null && cartao.getDtVencimento() != null &&
+			if(cartao.getBandeira().getId() != null && cartao.getCodSeguranca() != null && cartao.getDtVencimento() != null &&
 					cartao.getIdCliente() != null && cartao.getNomeImpresso() != null && cartao.getNumero() != null &&
 					cartao.getTipoCartao() != null) {
 				// VERIFICA SE TODOS OS CAMPOS OBRIGATÓRIOS DE CARTÃO ESTÃO PREENCHIDOS
-				if(cartao.getBandeira().getBin() != 0 && cartao.getCodSeguranca() != null && cartao.getBandeira().getNome() != "" &&
+				if(cartao.getCodSeguranca() != null && cartao.getBandeira().getId() != 0 &&
 						cartao.getDtVencimento() != null && cartao.getIdCliente() != 0 && cartao.getNomeImpresso() != "" && 
 						cartao.getNumero() != 0 && cartao.getTipoCartao() != 0) {
 					return null;

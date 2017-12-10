@@ -629,7 +629,7 @@
 	<p:dialog id="dlgPgto" header="Adicionar forma de pagamento" widgetVar="dialogPgto" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >	
 		<h:form id="formPgto">
 			<p:growl id="growl" showDetail="true" life="8000" />
-			<p:panelGrid id="pgFormaPgto">
+			<p:panelGrid id="pgFormaPgto" styleClass="ui-noborder">
 				<p:row>
 					<p:column>
 						<h:outputText value="Selecione a forma de pagamento:"/>
@@ -650,7 +650,7 @@
 					<p:column>
 						<p:panelGrid >
 							<p:row rendered="#{vendaMB.selFormaPgto == 'cartao'}">
-								<p:column>
+								<p:column rendered="#{vendaMB.cliente.cartoes.size() != 0}">
 									<p:panelGrid>
 										<p:row>
 											<p:column>
@@ -720,6 +720,9 @@
 										</p:row>
 									</p:panelGrid>
 								</p:column>
+								<p:column rendered="#{vendaMB.cliente.cartoes.size() == 0}">
+									<h:outputText value="Nenhum cartão cadastrado"/>
+								</p:column>
 							</p:row>
 							<p:row rendered="#{vendaMB.selFormaPgto == 'cupom'}">
 								<p:column>
@@ -730,9 +733,6 @@
 											</p:column>
 											<p:column>
 												<p:inputText value="#{vendaMB.cupomTroca.codigo}"/>
-											</p:column>
-											<p:column>
-												<p:commandButton value="Verificar" actionListener="#{vendaMB.validarCupomTroca}" update="growl"/>
 											</p:column>
 										</p:row>
 									</p:panelGrid>

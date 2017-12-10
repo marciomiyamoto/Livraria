@@ -20,7 +20,6 @@ import org.primefaces.context.RequestContext;
 import dominio.EnumTelefone;
 import dominio.Genero;
 import dominio.Telefone;
-import dominio.Usuario;
 import dominio.cliente.BandeiraCartao;
 import dominio.cliente.Cartao;
 import dominio.cliente.Cliente;
@@ -32,6 +31,10 @@ import dominio.endereco.EnumEndereco;
 import dominio.endereco.Estado;
 import dominio.endereco.Pais;
 import dominio.endereco.TipoEndereco;
+import dominio.venda.EnumStatusItemPedido;
+import dominio.venda.EnumStatusPedido;
+import dominio.venda.ItemPedido;
+import dominio.venda.Pedido;
 import livraria.controle.web.command.ICommand;
 import livraria.controle.web.command.impl.AlterarCommand;
 import livraria.controle.web.command.impl.ConsultarCommand;
@@ -97,6 +100,7 @@ public class PainelClienteMB {
 	private Boolean cartaoPrefEdit;
 	private Boolean endPreferencial;
 	private Boolean endPrefEdit;
+	private List<Pedido> pedidos;
 	
 	private static Map<String, ICommand> commands;
 	private ICommand command;
@@ -150,6 +154,7 @@ public class PainelClienteMB {
 		paisesPrefSalvar = new ArrayList<Pais>();
 		estadosPrefSalvar = new ArrayList<Estado>();
 		cidadesPrefSalvar = new ArrayList<Cidade>();
+		pedidos = new ArrayList<Pedido>();
 		
 		commands = new HashMap<String, ICommand>();
 		commands.put("SALVAR", new SalvarCommand());
@@ -168,6 +173,7 @@ public class PainelClienteMB {
 	    popularPaisesSalvar();
 	    popularPaisesCobSalvar();
 	    popularPaisesPrefSalvar();
+	    carregarPedidosCliente();
 	}
 	
 	private void popularGeneros() {
@@ -382,9 +388,31 @@ public class PainelClienteMB {
 		}
 	}
 	
+	public void carregarPedidosCliente() {
+		Pedido pedido = new Pedido();
+		pedido.setCliente(cliente);
+		
+		command = commands.get("CONSULTAR");
+		Resultado rs = command.execute(pedido);
+		
+		if (rs.getMsg() != null) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
+		} else {
+			for (int i = 0; i < rs.getEntidades().size(); i++) {
+				try {
+					pedidos.add(i, (Pedido) rs.getEntidades().get(i));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public void alterarCliente() {
 		cliente.setUsuario(cliente.getEmail());
 		cliente.setSenhaRepetida(cliente.getSenha());
+		cliente.setSenhaAntiga(cliente.getSenha());
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 		if(maskDtNascimento != null && maskDtNascimento != "") {
 			try {
@@ -489,12 +517,15 @@ public class PainelClienteMB {
 		cartaoSalvar.setBandeira(bandeiraSalvar);
 		cartaoSalvar.setTipoCartao(EnumTipoCartao.CADASTRO_CLIENTE.getValue());
 		SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
-		try {
-			Date data = format.parse(maskDtVencimentoSalvar);
-			cartaoSalvar.setDtVencimento(data);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if(maskDtVencimentoSalvar != null && maskDtVencimentoSalvar != "") {
+			try {
+				Date data = format.parse(maskDtVencimentoSalvar);
+				cartaoSalvar.setDtVencimento(data);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
+			
 		command = commands.get("SALVAR");
 		Resultado rs = command.execute(cartaoSalvar);
 		if (rs.getMsg() != null) {
@@ -521,11 +552,15 @@ public class PainelClienteMB {
 		cartao.setBandeira(bandeira);
 		cartao.setTipoCartao(EnumTipoCartao.CADASTRO_CLIENTE.getValue());
 		SimpleDateFormat format = new SimpleDateFormat("MM/yyyy");
-		try {
-			Date data = format.parse(maskDtVencimento);
-			cartao.setDtVencimento(data);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if(maskDtVencimento != null && maskDtVencimento != "") {
+			try {
+				Date data = format.parse(maskDtVencimento);
+				cartao.setDtVencimento(data);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		} else {
+			cartao.setDtVencimento(null);
 		}
 		command = commands.get("ALTERAR");
 		Resultado rs = command.execute(cartao);
@@ -728,6 +763,44 @@ public class PainelClienteMB {
 			cliente = (Cliente)rs.getEntidades().get(0);
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Endereço excluído com sucesso!"));
+		}
+		req.update("painelCliente:growl");
+	}
+	
+	public void trocarItemPedido(ItemPedido item) {
+		RequestContext req = RequestContext.getCurrentInstance();
+		int statusTemp = item.getStatus();
+		item.setStatus(EnumStatusItemPedido.EM_TROCA.getValue());
+		command = commands.get("ALTERAR");
+		Resultado rs = command.execute(item);
+		if(rs.getMsg() != null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
+		} else {
+			// ATUALIZANDO STATUS PEDIDO
+			Pedido pedido = new Pedido();
+			pedido.setId(item.getIdPedido());
+			pedido.setStatusPedido(EnumStatusPedido.ITEM_EM_TROCA.getValue());
+			command = commands.get("ALTERAR");
+			rs = command.execute(pedido);
+			if(rs.getMsg() != null) {
+				item.setStatus(statusTemp);
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
+			} else {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Pedido de troca feito com sucesso!"));
+			}
+		}
+		req.update("painelCliente:growl");
+	}
+	
+	public void trocarPedido(Pedido pedido) {
+		RequestContext req = RequestContext.getCurrentInstance();
+		pedido.setStatusPedido(EnumStatusPedido.PEDIDO_EM_TROCA.getValue());
+		command = commands.get("ALTERAR");
+		Resultado rs = command.execute(pedido);
+		if(rs.getMsg() != null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Pedido de troca feito com sucesso!"));
 		}
 		req.update("painelCliente:growl");
 	}
@@ -1171,6 +1244,14 @@ public class PainelClienteMB {
 
 	public void setCidadesPrefSalvar(List<Cidade> cidadesPrefSalvar) {
 		this.cidadesPrefSalvar = cidadesPrefSalvar;
+	}
+
+	public List<Pedido> getPedidos() {
+		return pedidos;
+	}
+
+	public void setPedidos(List<Pedido> pedidos) {
+		this.pedidos = pedidos;
 	}
 	
 }

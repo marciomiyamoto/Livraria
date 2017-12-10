@@ -69,10 +69,12 @@ import livraria.core.dao.impl.TipoTelefoneDAO;
 import livraria.core.dao.impl.UsuarioDAO;
 import livraria.core.negocio.impl.AssociarMotivoAtivacao;
 import livraria.core.negocio.impl.AssociarMotivoInativacao;
+import livraria.core.negocio.impl.GerarCodigoCupomTroca;
 import livraria.core.negocio.impl.ValidarAtualizacaoStatusPedido;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosCartao;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosCliente;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosConfigLivro;
+import livraria.core.negocio.impl.ValidarDadosObrigatoriosCupomTroca;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosEndereco;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosLivro;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosPedido;
@@ -83,6 +85,7 @@ import livraria.core.negocio.impl.ValidarPagamentosCupomTroca;
 import livraria.core.negocio.impl.ValidarPagamentosPedido;
 import livraria.core.negocio.impl.ValidarSenhaAntigaCliente;
 import livraria.core.negocio.impl.ValidarSenhaCadastroCliente;
+import livraria.core.negocio.impl.ValidarTrocaItemPedido;
 import livraria.core.negocio.impl.ValidarValorMinMaxCartaoCredito;
 import livraria.core.negocio.impl.ValidarValorTotalPagamentos;
 
@@ -189,6 +192,9 @@ public class Fachada implements IFachada {
 		ValidarSenhaAntigaCliente vSenhaAntigaCli = new ValidarSenhaAntigaCliente();
 		ValidarDadosObrigatoriosEndereco vDadosEnd = new ValidarDadosObrigatoriosEndereco();
 		ValidarDadosObrigatoriosCartao vDadosCartao = new ValidarDadosObrigatoriosCartao();
+		ValidarTrocaItemPedido vTrocaItemPed = new ValidarTrocaItemPedido();
+		GerarCodigoCupomTroca gerarCodCupTroca = new GerarCodigoCupomTroca();
+		ValidarDadosObrigatoriosCupomTroca vDadosCuptroca = new ValidarDadosObrigatoriosCupomTroca();
 		
 // LIVRO
 		/* Criando uma lista para conter as regras de negócio de livro
@@ -241,6 +247,20 @@ public class Fachada implements IFachada {
 		Map<String, List<IStrategy>> rnsItemPed = new HashMap<String, List<IStrategy>>();
 		rnsItemPed.put("CONSULTAR", rnsConsultarItemPedido);
 		
+		/* Criando uma lista para conter as regras de negócio de ItemPedido
+		 * quando a operação for alterar
+		 */
+		List<IStrategy> rnsAlterarItemPedido = new ArrayList<IStrategy>();
+		rnsAlterarItemPedido.add(vTrocaItemPed);
+		
+		/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+		 * por operação  do ItemPedido
+		 */
+		rnsItemPed.put("ALTERAR", rnsAlterarItemPedido);
+		
+		/* Adiciona o mapa com as regras indexadas pelas operações no mapa geral indexado 
+		 * pelo nome da entidade
+		 */
 		rns.put(ItemPedido.class.getName(), rnsItemPed);
 		
 // PEDIDO
@@ -351,6 +371,24 @@ public class Fachada implements IFachada {
 	rnsCartao.put("ALTERAR", rnsAtualizarCartao);
 	
 	rns.put(Cartao.class.getName(), rnsCartao);
+	
+// CUPOM TROCA
+	// SALVAR
+	/* Criando uma lista para conter as regras de negócio de Cupom de Troca
+	 * quando a operação for salvar
+	 */
+	List<IStrategy> rnsSalvarCupomTroca = new ArrayList<IStrategy>();
+	rnsSalvarCupomTroca.add(gerarCodCupTroca);
+	rnsSalvarCupomTroca.add(vDadosCuptroca);
+	
+	/* Cria o mapa que poderá conter todas as listas de regras de negócio específica 
+	 * por operação  do Cupom Troca
+	 */
+	Map<String, List<IStrategy>> rnsCupomTroca = new HashMap<String, List<IStrategy>>();
+	rnsCupomTroca.put("SALVAR", rnsSalvarCupomTroca);
+	
+		
+	rns.put(CupomTroca.class.getName(), rnsCupomTroca);
 }
 	
 	

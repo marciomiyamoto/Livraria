@@ -12,6 +12,7 @@ import dominio.EntidadeDominio;
 import dominio.cliente.Cliente;
 import dominio.endereco.Endereco;
 import dominio.venda.CupomPromocional;
+import dominio.venda.CupomTroca;
 import dominio.venda.CustoFrete;
 import dominio.venda.ItemBloqueioPedido;
 import dominio.venda.ItemPedido;
@@ -111,6 +112,17 @@ public class PedidoDAO extends AbstractJdbcDAO {
 				itemDao.alterar(i);
 			}
 			
+			// ATUALIZANDO STATUS LISTA DE CUPONS DE TROCA UTILIZADOS
+			CupomTrocaDAO cupDao = new CupomTrocaDAO();
+			cupDao.ctrlTransacao = false;
+			for(Pagamento pgto : pedido.getPagamentos()) {
+				if(pgto.getFormaPgto().getCupomTroca() != null) {
+					CupomTroca cupom = pgto.getFormaPgto().getCupomTroca();
+					cupom.setAtivo(false);
+					cupDao.alterar(cupom);
+				}
+			}
+			
 		} catch(SQLException e) {
 			try {
 				connection.rollback();
@@ -202,8 +214,12 @@ public class PedidoDAO extends AbstractJdbcDAO {
 		sql.append("WHERE 1=1 ");
 		
 		if(pedido.getId() != null && pedido.getId() != 0) {
-			sql.append("AND id = ?");
+			sql.append("AND id = ? ");
 		}
+		if(pedido.getCliente() != null && pedido.getCliente().getId() != null && pedido.getCliente().getId() != 0) {
+			sql.append("AND id_cliente = ? ");
+		}
+		
 		try {
 			pst = connection.prepareStatement(sql.toString());
 			int i = 1;
@@ -212,6 +228,10 @@ public class PedidoDAO extends AbstractJdbcDAO {
 				pst.setInt(i, pedido.getId());
 				i++;
 			}
+			if(pedido.getCliente() != null && pedido.getCliente().getId() != null && pedido.getCliente().getId() != 0) {
+				pst.setInt(i, pedido.getCliente().getId());
+			}
+			
 			ResultSet rs = pst.executeQuery();
 			List<EntidadeDominio> pedidos = new ArrayList<EntidadeDominio>()	;
 			while(rs.next() ) {

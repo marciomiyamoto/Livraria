@@ -24,21 +24,33 @@ public class ValidarAtualizacaoStatusPedido implements IStrategy {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			// VERIFICA SE O PEDIDO ESTÁ COM STATUS EM PROCESSAMENTO, CASO ESTEJA, SERÁ ATUALIZADO NA VALIDAÇÃO ValidarPagamentosPedido
-			if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_PROCESSAMENTO.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.EM_PROCESSAMENTO.getValue())) {
-				return "Status EM PROCESSAMENTO não deve ser alterado até o pagamento ser validado";
-			// VERIFICA SE O PEDIDO ESTÁ COM STATUS APROVADO E SERÁ ATUALIZADO PARA STATUS EM TRANSPORTE
-			} else if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.APROVADO.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.EM_TRANSPORTE.getValue())) {
-				return "Status APROVADO deve ser atualizado para EM TRANSPORTE";
-			// VERIFICA SE O PEDIDO ESTÁ COM STATUS EM TRANSPORTE E SERÁ ATUALIZADO PARA STATUS EM ENTREGUE
-			} else if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_TRANSPORTE.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.ENTREGUE.getValue())) {
-				return "Status EM TRANSPORTE deve ser atualizado para ENTREGUE";
-			// VERIFICA SE O PEDIDO ESTÁ COM STATUS ENTREGUE E SERÁ ATUALIZADO PARA STATUS EM TROCA
-			} else if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.ENTREGUE.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.EM_TROCA.getValue())) {
-				return "Status ENTREGUE deve ser atualizado para EM TROCA";
-			// VERIFICA SE O PEDIDO ESTÁ COM STATUS EM TROCA E SERÁ ATUALIZADO PARA STATUS TROCADO
-			} else if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_TROCA.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.TROCADO.getValue())) {
-				return "Status EM TROCA deve ser atualizado para TROCADO";
+			// VERIFICA SE O STATUS ATUAL ESTÁ ELEGÍVEL PARA SER ATUALIZADO
+			if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_PROCESSAMENTO.getValue()) ||
+					pedidoTemp.getStatusPedido().equals(EnumStatusPedido.APROVADO.getValue()) ||
+					pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_TRANSPORTE.getValue()) ||
+					pedidoTemp.getStatusPedido().equals(EnumStatusPedido.ENTREGUE.getValue()) ||
+					pedidoTemp.getStatusPedido().equals(EnumStatusPedido.ITEM_EM_TROCA.getValue()) ||
+					pedidoTemp.getStatusPedido().equals(EnumStatusPedido.PEDIDO_EM_TROCA.getValue())) {
+				// VERIFICA SE O PEDIDO ESTÁ COM STATUS EM PROCESSAMENTO, CASO ESTEJA, SERÁ ATUALIZADO NA VALIDAÇÃO ValidarPagamentosPedido
+				if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_PROCESSAMENTO.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.EM_PROCESSAMENTO.getValue())) {
+					return "Status EM PROCESSAMENTO não deve ser alterado até o pagamento ser validado";
+				// VERIFICA SE O PEDIDO ESTÁ COM STATUS APROVADO E SERÁ ATUALIZADO PARA STATUS EM TRANSPORTE
+				} else if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.APROVADO.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.EM_TRANSPORTE.getValue())) {
+					return "Status APROVADO deve ser atualizado para EM TRANSPORTE";
+				// VERIFICA SE O PEDIDO ESTÁ COM STATUS EM TRANSPORTE E SERÁ ATUALIZADO PARA STATUS EM ENTREGUE
+				} else if(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.EM_TRANSPORTE.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.ENTREGUE.getValue())) {
+					return "Status EM TRANSPORTE deve ser atualizado para ENTREGUE";
+				// VERIFICA SE O PEDIDO ESTÁ COM STATUS ENTREGUE E SERÁ ATUALIZADO PARA STATUS PEDIDO EM TROCA
+				} else if((pedidoTemp.getStatusPedido().equals(EnumStatusPedido.ENTREGUE.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.PEDIDO_EM_TROCA.getValue())) &&
+						(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.ENTREGUE.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.ITEM_EM_TROCA.getValue()))) {
+					return "Status ENTREGUE deve ser atualizado para EM TROCA";
+				// VERIFICA SE O PEDIDO ESTÁ COM STATUS EM TROCA E SERÁ ATUALIZADO PARA STATUS TROCADO
+				} else if((pedidoTemp.getStatusPedido().equals(EnumStatusPedido.PEDIDO_EM_TROCA.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.TROCADO.getValue())) && 
+						(pedidoTemp.getStatusPedido().equals(EnumStatusPedido.ITEM_EM_TROCA.getValue()) && !pedido.getStatusPedido().equals(EnumStatusPedido.TROCADO.getValue()))) {
+					return "Status EM TROCA deve ser atualizado para TROCADO";
+				}
+			} else {
+				return "Status inválido!";
 			}
 		}
 		return null;

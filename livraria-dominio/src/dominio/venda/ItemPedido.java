@@ -10,6 +10,7 @@ public class ItemPedido extends EntidadeDominio {
 	private Estoque estoque;
 	private Integer idPedido;
 	private Double valorUnitario;
+	private Integer status;
 	
 	public Integer getQtde() {
 		return qtde;
@@ -35,6 +36,12 @@ public class ItemPedido extends EntidadeDominio {
 	public void setValorUnitario(Double valorUnitario) {
 		this.valorUnitario = valorUnitario;
 	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -42,6 +49,7 @@ public class ItemPedido extends EntidadeDominio {
 		result = prime * result + ((estoque == null) ? 0 : estoque.hashCode());
 		result = prime * result + ((idPedido == null) ? 0 : idPedido.hashCode());
 		result = prime * result + ((qtde == null) ? 0 : qtde.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		result = prime * result + ((valorUnitario == null) ? 0 : valorUnitario.hashCode());
 		return result;
 	}
@@ -69,6 +77,11 @@ public class ItemPedido extends EntidadeDominio {
 				return false;
 		} else if (!qtde.equals(other.qtde))
 			return false;
+		if (status == null) {
+			if (other.status != null)
+				return false;
+		} else if (!status.equals(other.status))
+			return false;
 		if (valorUnitario == null) {
 			if (other.valorUnitario != null)
 				return false;
@@ -79,7 +92,7 @@ public class ItemPedido extends EntidadeDominio {
 	@Override
 	public String toString() {
 		return "ItemPedido [qtde=" + qtde + ", estoque=" + estoque + ", idPedido=" + idPedido + ", valorUnitario="
-				+ valorUnitario + "]";
+				+ valorUnitario + ", status=" + status + "]";
 	}
-
+	
 }

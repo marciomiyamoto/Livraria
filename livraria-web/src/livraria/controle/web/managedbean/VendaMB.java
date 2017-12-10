@@ -36,6 +36,7 @@ import dominio.livro.Registro;
 import dominio.venda.CupomPromocional;
 import dominio.venda.CupomTroca;
 import dominio.venda.CustoFrete;
+import dominio.venda.EnumStatusItemPedido;
 import dominio.venda.EnumStatusPedido;
 import dominio.venda.EnumStatusPgto;
 import dominio.venda.EnumTipoEnvio;
@@ -340,8 +341,13 @@ public class VendaMB {
 				}
 				if(c.getCartaoPreferencial() != null) {
 					cartao = c.getCartaoPreferencial();
+					c.getCartoes().add(cartao);
 				} else {
-					cartao = c.getCartoes().get(0);
+					if(c.getCartoes() != null && c.getCartoes().size() != 0) {
+						cartao = c.getCartoes().get(0);
+					} else {
+						cartao = null;
+					}
 				}
 				break;
 			}
@@ -576,42 +582,63 @@ public class VendaMB {
 		CupomTroca cupomTrocaTemp = new CupomTroca();
 		
 		if(selFormaPgto.equals("cartao")) {
-			cartaoTemp.setBandeira(cartao.getBandeira());
-			cartaoTemp.setCodSeguranca(cartao.getCodSeguranca());
-			cartaoTemp.setDtVencimento(cartao.getDtVencimento());
-			cartaoTemp.setIdCliente(cartao.getIdCliente());
-			cartaoTemp.setNomeImpresso(cartao.getNomeImpresso());
-			cartaoTemp.setNumero(cartao.getNumero());
-			cartaoTemp.setTipoCartao(EnumTipoCartao.PEDIDO.getValue());
-			
-			formaPgto.setCartao(cartaoTemp);
-			pgtoTemp.setFormaPgto(formaPgto);
-			pgtoTemp.setValor(pagamento.getValor());
-			cartoesPtgo.add(pgtoTemp);
-			
-			pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
-			pagamentos.add(pgtoTemp);
+			if(cartao != null) {				
+				cartaoTemp.setBandeira(cartao.getBandeira());
+				cartaoTemp.setCodSeguranca(cartao.getCodSeguranca());
+				cartaoTemp.setDtVencimento(cartao.getDtVencimento());
+				cartaoTemp.setIdCliente(cartao.getIdCliente());
+				cartaoTemp.setNomeImpresso(cartao.getNomeImpresso());
+				cartaoTemp.setNumero(cartao.getNumero());
+				cartaoTemp.setTipoCartao(EnumTipoCartao.PEDIDO.getValue());
+				
+				formaPgto.setCartao(cartaoTemp);
+				pgtoTemp.setFormaPgto(formaPgto);
+				pgtoTemp.setValor(pagamento.getValor());
+				pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
+				
+				boolean flgCartaoExiste = false;
+				for(Pagamento p : cartoesPtgo) {
+					if(p.getFormaPgto().getCartao().getNumero() == pgtoTemp.getFormaPgto().getCartao().getNumero()) {
+						p.setValor(pgtoTemp.getValor());
+						flgCartaoExiste = true;
+					}
+				}
+				if(!flgCartaoExiste) {
+					cartoesPtgo.add(pgtoTemp);
+					pagamentos.add(pgtoTemp);
+				}
+			}
 			RequestContext.getCurrentInstance().execute("PF('dialogPgto').hide()");
 		} else if(selFormaPgto.equals("cupom")) {
-			if(cupomTroca.getId() != null && cupomTroca.getId() != 0) {
-				cupomTrocaTemp.setAtivo(cupomTroca.getAtivo());
-				cupomTrocaTemp.setCodigo(cupomTroca.getCodigo());
-				cupomTrocaTemp.setIdCliente(cliente.getId());
-				cupomTrocaTemp.setDtCadastro(cupomTroca.getDtCadastro());
-				cupomTrocaTemp.setId(cupomTroca.getId());
-				cupomTrocaTemp.setValor(cupomTroca.getValor());
+			if(!cupomTroca.getCodigo().equals("")) {
+				command = commands.get("CONSULTAR");
+				Resultado rs = command.execute(cupomTroca);
 				
-				formaPgto.setCupomTroca(cupomTrocaTemp);
-				pgtoTemp.setFormaPgto(formaPgto);
-				pgtoTemp.setValor(cupomTrocaTemp.getValor());
-				cuponsTrocaPgto.add(pgtoTemp);
-				
-				pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
-				pagamentos.add(pgtoTemp);
-				RequestContext.getCurrentInstance().execute("PF('dialogPgto').hide()");
-			} else {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cupom inválido!"));
+				if(rs.getMsg() != null || rs.getEntidades().size() == 0) {
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cupom inválido"));
+				} else {
+					cupomTroca = (CupomTroca)rs.getEntidades().get(0);
+					if(cupomTroca.getAtivo()) {
+						cupomTrocaTemp.setAtivo(cupomTroca.getAtivo());
+						cupomTrocaTemp.setCodigo(cupomTroca.getCodigo());
+						cupomTrocaTemp.setIdCliente(cliente.getId());
+						cupomTrocaTemp.setDtCadastro(cupomTroca.getDtCadastro());
+						cupomTrocaTemp.setId(cupomTroca.getId());
+						cupomTrocaTemp.setValor(cupomTroca.getValor());
+						
+						formaPgto.setCupomTroca(cupomTrocaTemp);
+						pgtoTemp.setFormaPgto(formaPgto);
+						pgtoTemp.setValor(cupomTrocaTemp.getValor());
+						cuponsTrocaPgto.add(pgtoTemp);
+						
+						pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
+						pagamentos.add(pgtoTemp);
+					} else {
+						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cupom já foi utilizado"));
+					}
+				}
 			}
+			RequestContext.getCurrentInstance().execute("PF('dialogPgto').hide()");
 		}
 		pagamento.setValor(0);
 		cartao = cliente.getCartaoPreferencial();
@@ -624,38 +651,37 @@ public class VendaMB {
 		double valorTemp = 0;
 		FormaPgto formaPgto = new FormaPgto();
 		Pagamento pgtoTemp = new Pagamento();
-		
+		// PERCORRE TODA A LISTA DE PGTOS E SOMA TODOS OS VALORES
 		for(Pagamento p : pagamentos) {
 			valorTemp += p.getValor();
 		}
-		cartao.setTipoCartao(EnumTipoCartao.PEDIDO.getValue());
-		formaPgto.setCartao(cartao);
-		pgtoTemp.setFormaPgto(formaPgto);
-		pgtoTemp.setValor(pedido.getValorTotalComDescontos() - valorTemp);
-		cartoesPtgo.add(pgtoTemp);
-		
-		pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
-		pagamentos.add(pgtoTemp);
-		RequestContext.getCurrentInstance().execute("PF('dialogPgto').hide()");
-	}
-	
-	public void validarCupomTroca() {
-		command = commands.get("CONSULTAR");
-		Resultado rs = command.execute(cupomTroca);
-		
-		if(rs.getMsg() != null) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", rs.getMsg()));
-		} else {
-			if(rs.getEntidades().size() > 0) {
-				CupomTroca cupomTemp = (CupomTroca)rs.getEntidades().get(0);
-				if(cupomTroca.getCodigo().equals(cupomTemp.getCodigo()) && cupomTemp.getAtivo().equals(true)) {
-					cupomTroca = cupomTemp;
-					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cupom válido!"));
+		// CASO O VALOR TOTAL DE TODOS OS PGTOS SEJA MENOR QUE O VALOR FINAL DO PEDIDO, 
+		// SERÁ ADICIONADO O CARTÃO SELECIONADO COMO FORMA DE PGTO, COM O VALOR RESTANTE PARA COMPLETAR O PAGAMENTO
+		if(valorTemp < pedido.getValorTotalComDescontos()) {
+			cartao.setTipoCartao(EnumTipoCartao.PEDIDO.getValue());
+			formaPgto.setCartao(cartao);
+			pgtoTemp.setFormaPgto(formaPgto);
+			pgtoTemp.setValor(pedido.getValorTotalComDescontos() - valorTemp);
+			pgtoTemp.setStatus(EnumStatusPgto.PENDENTE.getValue());
+			// VERIFICA SE O CARTÃO SELECIONADO JÁ ESTÁ NA LISTA DE PGTOS,
+			// CASO ESTEJA, TERÁ O VALOR SUBSTITUÍDO PELO VALOR TOTAL RESTANTE PARA PAGAMENTO DO PEDIDO
+			boolean flgCartaoExiste = false;
+			for(Pagamento p : cartoesPtgo) {
+				if(p.getFormaPgto().getCartao().getNumero() == pgtoTemp.getFormaPgto().getCartao().getNumero()) {
+					p.setValor(pedido.getValorTotalComDescontos());
+					flgCartaoExiste = true;
 				}
-			} else {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Cupom inválido!"));
+			}
+			// CASO O CARTÃO NÃO EXISTA NA LISTA DE PGTOS, SERÁ ADICIONADO
+			if(!flgCartaoExiste) {
+				cartoesPtgo.add(pgtoTemp);
+				pagamentos.add(pgtoTemp);
 			}
 		}
+		RequestContext.getCurrentInstance().execute("PF('dialogPgto').hide()");
+		pagamento.setValor(0);
+		cartao = cliente.getCartaoPreferencial();
+		selFormaPgto = "";
 	}
 	
 	public void removerCupomPromocional() {
@@ -698,6 +724,10 @@ public class VendaMB {
 		pedido.setCliente(cliente);
 		pedido.setPagamentos(pagamentos);
 		pedido.setStatusPedido(EnumStatusPedido.EM_PROCESSAMENTO.getValue());
+		
+		for(ItemPedido item : pedido.getItens()) {
+			item.setStatus(EnumStatusItemPedido.EM_PROCESSAMENTO.getValue());
+		}
 		
 		Resultado rs;
 		// salvar cartao, caso flgSalvarCartao == true

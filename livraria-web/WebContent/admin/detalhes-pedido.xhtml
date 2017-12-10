@@ -8,7 +8,7 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 <h:head></h:head>
 <h:body>
-	<h:form>
+	<h:form id="detalhes">
 		<p:growl id="growl" showDetail="true" life="8000" />
 		<p:panelGrid id="pgDetalhes" styleClass="ui-noborder">
 			<p:row>
@@ -208,6 +208,15 @@
 						<p:column headerText="VALOR UNITÁRIO">
 							<h:outputText value="#{item.valorUnitario}" />
 						</p:column>
+						<p:column headerText="STATUS">
+							<h:outputText value="#{item.status}" />
+						</p:column>
+						<p:column>
+							<p:commandButton value="Autorizar troca de item" oncomplete="PF('dlgTrocaItem').show()" 
+												disabled="#{item.status != 7}" update="dlgTrocaItem">
+								<f:setPropertyActionListener value="#{item}" target="#{adminMB.itemTroca}" />
+							</p:commandButton>
+						</p:column>
 					</p:dataTable>
 				</p:column>
 			</p:row>
@@ -288,8 +297,9 @@
 									<f:selectItem itemLabel="APROVADO" itemValue="2" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 999}"/>
 									<f:selectItem itemLabel="EM TRANSPORTE" itemValue="4" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 2}"/>
 									<f:selectItem itemLabel="ENTREGUE" itemValue="5" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 4}"/>
-									<f:selectItem itemLabel="EM TROCA" itemValue="7" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 7}"/>
-									<f:selectItem itemLabel="TROCADO" itemValue="8" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 7}"/>
+									<f:selectItem itemLabel="PEDIDO EM TROCA" itemValue="7" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 7}"/>
+									<f:selectItem itemLabel="ITEM EM TROCA" itemValue="8" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 8}"/>
+									<f:selectItem itemLabel="TROCADO" itemValue="9" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 9}"/>
 									<f:selectItem itemLabel="REPROVADO" itemValue="3" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 3}"/>
 									<f:selectItem itemLabel="CANCELADO" itemValue="6" itemDisabled="#{adminMB.pedidoSelecionado.statusPedido != 6}"/>
 								</p:selectOneRadio>
@@ -299,9 +309,12 @@
 						<p:row>
 							<p:column>
 								<p:commandButton value="Atualizar status" actionListener="#{adminMB.atualizarPedido}" 
-									update="growl pgDetalhes" disabled="#{adminMB.pedidoSelecionado.statusPedido == 1}"/>
-								<p:commandButton value="Veriricar pagamento" actionListener="#{adminMB.verificarPagamento}" 
-									update="growl pgDetalhes" disabled="#{adminMB.pedidoSelecionado.statusPedido != 1}"/>
+									update="growl detalhes:pgDetalhes" disabled="#{adminMB.pedidoSelecionado.statusPedido != 2 and adminMB.pedidoSelecionado.statusPedido != 4}"/>
+								<p:commandButton value="Verificar pagamento" actionListener="#{adminMB.verificarPagamento}" 
+									update="growl detalhes:pgDetalhes" 
+									disabled="#{adminMB.pedidoSelecionado.statusPedido != 1}"/>
+								<p:commandButton value="Autorizar troca" oncomplete="PF('dlgTrocaPedido').show()" update="dlgTrocaPedido"
+									disabled="#{adminMB.pedidoSelecionado.statusPedido != 7}"/>
 							</p:column>
 						</p:row>
 					</p:panelGrid>
@@ -309,5 +322,33 @@
 			</p:row>
 		</p:panelGrid>
 	</h:form>
+	
+	<p:dialog header="Pedidos" id="dlgTrocaItem" widgetVar="dlgTrocaItem" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+		<h:form>
+			<h:panelGrid>
+				<p:outputLabel value="Deseja retornar item ao estoque?"/>
+				<p:selectOneRadio value="#{adminMB.flgDevolverItens}">
+					<f:selectItem itemLabel="Sim" itemValue="true"/>
+					<f:selectItem itemLabel="Não" itemValue="false"/>
+				</p:selectOneRadio>
+				<p:commandButton value="Confirma" actionListener="#{adminMB.confirmarTrocaItem}" 
+					oncomplete="PF('dlgTrocaItem').hide()" update="detalhes:growl detalhes:pgDetalhes"/>			
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	
+	<p:dialog header="Pedidos" id="dlgTrocaPedido" widgetVar="dlgTrocaPedido" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+		<h:form>
+			<h:panelGrid>
+				<p:outputLabel value="Deseja retornar o(s) item(ns) ao estoque?"/>
+				<p:selectOneRadio value="#{adminMB.flgDevolverItens}">
+					<f:selectItem itemLabel="Sim" itemValue="true"/>
+					<f:selectItem itemLabel="Não" itemValue="false"/>
+				</p:selectOneRadio>
+				<p:commandButton value="Confirma" actionListener="#{adminMB.confirmarTrocaPedido}"
+					oncomplete="PF('dlgTrocaPedido').hide()" update="detalhes:growl detalhes:pgDetalhes"/>			
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
 </h:body>
 </html>

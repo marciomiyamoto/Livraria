@@ -109,7 +109,7 @@
 						</p:row>
 						<p:row>
 							<p:column colspan="2">
-								<p:commandLink value="Pedidos"/>
+								<p:commandLink value="Pedidos" oncomplete="PF('dlgPedidos').show()" update="painelCliente:dlgPedidos"/>
 							</p:column>
 						</p:row>
 					</p:panelGrid>
@@ -121,6 +121,14 @@
 					<h1>Endereço residencial</h1>
 					<p:outputLabel value="Nenhum endereço cadastrado" rendered="#{painelClienteMB.cliente.enderecoResidencial == null}"/>
 					<p:panelGrid rendered="#{painelClienteMB.cliente.enderecoResidencial != null}" styleClass="ui-noborder">
+						<p:row>
+							<p:column>
+								<p:outputLabel value="Título:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.enderecoResidencial.titulo}"/>
+							</p:column>
+						</p:row>
 						<p:row>
 							<p:column>
 								<p:outputLabel value="Tipo de residência:" style="font-weight: bold;"/>
@@ -217,6 +225,14 @@
 					<p:panelGrid rendered="#{painelClienteMB.cliente.endCobranca != null}" styleClass="ui-noborder">
 						<p:row>
 							<p:column>
+								<p:outputLabel value="Título:" style="font-weight: bold;"/>
+							</p:column>
+							<p:column>
+								<h:outputText value="#{painelClienteMB.cliente.endCobranca.titulo}"/>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
 								<p:outputLabel value="Tipo de residência:" style="font-weight: bold;"/>
 							</p:column>
 							<p:column>
@@ -308,11 +324,6 @@
 								<p:commandLink value="Editar" oncomplete="PF('dlgEditarEnd').show()" update="painelCliente:dlgEditarEnd">
 									<f:setPropertyActionListener value="#{painelClienteMB.cliente.endCobranca}" target="#{painelClienteMB.endereco}" />
 								</p:commandLink>
-							</p:column>
-						</p:row>
-						<p:row rendered="#{painelClienteMB.cliente.endCobranca != null}">
-							<p:column>
-								<p:commandLink value="Excluir" action="#{painelClienteMB.excluirEndereco(painelClienteMB.cliente.endCobranca)}" update="painelCliente:pnCliente"/>
 							</p:column>
 						</p:row>
 					</p:panelGrid>
@@ -535,7 +546,7 @@
 									</p:commandLink>
 								</p:column>
 							</p:row>
-							<p:row rendered="#{painelClienteMB.cliente.endsEntrega.size() != 0}">
+							<p:row rendered="#{painelClienteMB.cliente.endsEntrega.size() != 1}">
 								<p:column>
 									<p:commandLink value="Excluir" action="#{painelClienteMB.excluirEndereco(end)}" update="painelCliente:pnCliente"/>
 								</p:column>
@@ -1456,6 +1467,87 @@
 					</p:column>
 				</p:row>
 			</p:panelGrid>
+		</p:dialog>
+		
+		<p:dialog header="Pedidos" id="dlgPedidos" widgetVar="dlgPedidos" modal="true" showEffect="fade" hideEffect="fade" resizable="false" >
+			<p:dataTable var="pedido" value="#{painelClienteMB.pedidos}"
+						 paginator="true"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="1,2,3">
+                         <p:column>
+				<p:panelGrid>
+					<p:row>
+						<p:column>
+							<p:panelGrid styleClass="ui-noborder">
+								<p:row>
+									<p:column>
+										<h:outputText value="ID: " style="font-weight: bold;"/>
+									</p:column>
+									<p:column>
+										<h:outputText value="#{pedido.id}"/>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<h:outputText value="Data do pedido: " style="font-weight: bold;"/>
+									</p:column>
+									<p:column>
+										<h:outputText value="#{pedido.dtCadastro}"/>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<h:outputText value="Valor total: " style="font-weight: bold;"/>
+									</p:column>
+									<p:column>
+										<h:outputText value="#{pedido.valorTotalComDescontos}"/>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<h:outputText value="Status: " style="font-weight: bold;"/>
+									</p:column>
+									<p:column>
+										<h:outputText value="#{pedido.statusPedido}"/>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column colspan="2">
+										<p:dataTable var="item" value="#{pedido.itens}">
+											<f:facet name="header">
+										        Itens do pedido
+										    </f:facet>
+											<p:column headerText="ID">
+												<h:outputText value="#{item.id}"/>
+											</p:column>
+											<p:column headerText="Título">
+												<h:outputText value="#{item.estoque.livro.titulo}"/>
+											</p:column>
+											<p:column headerText="Qtde">
+												<h:outputText value="#{item.qtde}"/>
+											</p:column>
+											<p:column headerText="Status">
+												<h:outputText value="#{item.status}"/>
+											</p:column>
+											<p:column>
+												<p:commandButton value="Trocar" actionListener="#{painelClienteMB.trocarItemPedido(item)}" 
+																	disabled="#{item.status != 5 or pedido.statusPedido != 5}" oncomplete="PF('dlgPedidos').hide()"/>
+											</p:column>
+										</p:dataTable>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:commandButton value="Solicitar troca do pedido" actionListener="#{painelClienteMB.trocarPedido(pedido)}" 
+															disabled="#{pedido.statusPedido != 5}" oncomplete="PF('dlgPedidos').hide()"/>
+									</p:column>
+								</p:row>
+							</p:panelGrid>						
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				</p:column>
+			</p:dataTable>
 		</p:dialog>
 	</h:form>
 </h:body>
