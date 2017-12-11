@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head></h:head>
+<h:body>
+	<h:form id="grafico">
+		<p:panel rendered="#{graficoMB.flgGerar}">
+			<p:chart type="line" model="#{graficoMB.linhaModelo}" style="height:300px;"/>
+		</p:panel>
+		<p:panelGrid styleClass="ui-noborder">
+			<p:row>
+				<p:column>
+					<h:outputText value="Livro A: "/>
+				</p:column>
+				<p:column>
+					<p:selectOneMenu value="#{graficoMB.estoqueA.id}">
+						<f:selectItems value="#{graficoMB.estoques}" var="est" itemLabel="#{est.livro.titulo}" itemValue="#{est.id}"/>
+					</p:selectOneMenu>					
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputText value="Livro B: "/>
+				</p:column>
+				<p:column>
+					<p:selectOneMenu value="#{graficoMB.estoqueB.id}">
+						<f:selectItems value="#{graficoMB.estoques}" var="est" itemLabel="#{est.livro.titulo}" itemValue="#{est.id}"/>
+					</p:selectOneMenu>					
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputText value="Livro C: "/>
+				</p:column>
+				<p:column>
+					<p:selectOneMenu value="#{graficoMB.estoqueC.id}">
+						<f:selectItems value="#{graficoMB.estoques}" var="est" itemLabel="#{est.livro.titulo}" itemValue="#{est.id}"/>
+					</p:selectOneMenu>					
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputText value="De: "/>
+				</p:column>
+				<p:column>
+					<p:calendar value="#{graficoMB.livroPerVend.dtInicial}"/>
+				</p:column>
+				<p:column>
+					<h:outputText value=" à: "/>
+				</p:column>
+				<p:column>
+					<p:calendar value="#{graficoMB.livroPerVend.dtFinal}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputText value="Qtde min: "/>
+				</p:column>
+				<p:column>
+					<p:inputText value="#{graficoMB.livroPerVend.qtdeMin}"/>
+				</p:column>
+				<p:column>
+					<h:outputText value=" Qtde máx: "/>
+				</p:column>
+				<p:column>
+					<p:inputText value="#{graficoMB.livroPerVend.qtdeMax}"/>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<h:outputText value=" Período: "/>
+				</p:column>
+				<p:column>
+					<p:selectOneMenu value="#{graficoMB.livroPerVend.tipoPeriodo}">
+						<f:selectItem itemLabel="Dia" itemValue="1"/>
+						<f:selectItem itemLabel="Mês" itemValue="2"/>
+						<f:selectItem itemLabel="Ano" itemValue="3"/>
+					</p:selectOneMenu>
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<p:commandButton value="Gerar gráfico" actionListener="#{graficoMB.gerarGrafico}" update="grafico"/>
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+	</h:form>
+</h:body>
+</html>

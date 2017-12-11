@@ -11,6 +11,7 @@ import dominio.Genero;
 import dominio.Telefone;
 import dominio.TipoTelefone;
 import dominio.Usuario;
+import dominio.analise.LivroPeriodoVendas;
 import dominio.cliente.BandeiraCartao;
 import dominio.cliente.Cartao;
 import dominio.cliente.Cliente;
@@ -54,6 +55,7 @@ import livraria.core.dao.impl.EnderecoDAO;
 import livraria.core.dao.impl.EstadoDAO;
 import livraria.core.dao.impl.EstoqueDAO;
 import livraria.core.dao.impl.GeneroDAO;
+import livraria.core.dao.impl.GraficoLivroPeriodoVendaDAO;
 import livraria.core.dao.impl.GrupoDePrecificacaoDAO;
 import livraria.core.dao.impl.ItemBloqueioPedidoDAO;
 import livraria.core.dao.impl.ItemPedidoDAO;
@@ -79,8 +81,8 @@ import livraria.core.negocio.impl.ValidarDadosObrigatoriosEndereco;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosLivro;
 import livraria.core.negocio.impl.ValidarDadosObrigatoriosPedido;
 import livraria.core.negocio.impl.ValidarEstoqueItemPedido;
-import livraria.core.negocio.impl.ValidarFrete;
 import livraria.core.negocio.impl.ValidarEstoqueItensFinalizacaoPedido;
+import livraria.core.negocio.impl.ValidarFrete;
 import livraria.core.negocio.impl.ValidarPagamentosCupomTroca;
 import livraria.core.negocio.impl.ValidarPagamentosPedido;
 import livraria.core.negocio.impl.ValidarSenhaAntigaCliente;
@@ -141,6 +143,7 @@ public class Fachada implements IFachada {
 		PedidoDAO pedidoDAO = new PedidoDAO();
 		ItemBloqueioPedidoDAO itemBloqPedDAO = new ItemBloqueioPedidoDAO();
 		ItemPedidoDAO itemPedDao = new ItemPedidoDAO();
+		GraficoLivroPeriodoVendaDAO graficoLivPerVenDao = new GraficoLivroPeriodoVendaDAO();
 		
 		/* Adicionando cada dao no MAP indexando pelo nome da classe */
 //		daos.put(Bebida.class.getName(), bebidaDAO);
@@ -172,6 +175,7 @@ public class Fachada implements IFachada {
 		daos.put(Pedido.class.getName(), pedidoDAO);
 		daos.put(ItemBloqueioPedido.class.getName(), itemBloqPedDAO);
 		daos.put(ItemPedido.class.getName(), itemPedDao);
+		daos.put(LivroPeriodoVendas.class.getName(), graficoLivPerVenDao);
 		
 		/* Criando instâncias de regras de negócio a serem utilizados*/		
 		ValidarDadosObrigatoriosLivro vDadosObrigatoriosLivro = new ValidarDadosObrigatoriosLivro();
