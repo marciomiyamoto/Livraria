@@ -1,0 +1,77 @@
+create table livro_log (
+  data date,
+  hora varchar2(9),
+  acao varchar2(20),
+  usuario varchar2(30),
+  id_livro varchar2(10),
+  old_titulo varchar2(50),  
+  old_ano varchar2(10),
+  old_edicao varchar2(10),
+  old_numPaginas varchar2(10),
+  old_codBarras varchar2(30),
+  old_status varchar2(10),
+  old_sinopse varchar2(400),
+  old_editora varchar2(30),
+  old_autor varchar2(50),
+  old_categorias varchar2(100),
+  old_subcategorias varchar2(100),
+  old_altura varchar2(10),
+  old_largura varchar2(10),
+  old_peso varchar2(10),
+  old_profundidade varchar2(10),
+  old_grupoprec varchar2(10),
+  old_justificativa varchar(300),
+  old_catativinativacao varchar(30),
+  new_titulo varchar2(50),
+  new_ano varchar2(10),
+  new_edicao varchar2(10),
+  new_numPaginas varchar2(10),
+  new_codBarras varchar2(30),
+  new_status varchar2(10),
+  new_sinopse varchar2(400),
+  new_editora varchar2(30),
+  new_autor varchar2(50),
+  new_categorias varchar2(100),
+  new_subcategorias varchar2(100),
+  new_altura varchar2(10),
+  new_largura varchar2(10),
+  new_peso varchar2(10),
+  new_profundidade varchar2(10),
+  new_grupoprec varchar2(10),
+  new_justificativa varchar(300),
+  new_catativinativacao varchar(30)
+  );
+  
+create or replace trigger trg_livro_log
+  after insert or update or delete
+    on livro
+  FOR EACH ROW
+  begin
+    if inserting then
+      insert into livro_log(id_livro, data, hora, usuario, acao, new_titulo, new_ano, new_edicao, new_numPaginas,
+        new_codBarras, new_status,new_sinopse,new_editora, new_autor, new_categorias, new_subcategorias,
+        new_altura,  new_largura, new_peso, new_profundidade, new_grupoprec, new_justificativa, new_catativinativacao) 
+      values(:new.id, sysdate, to_char(sysdate,'HH24:MI:SS'), 'Marcio', 'INSERT', :new.titulo, :new.ano, :new.edicao, :new.numpaginas,
+        :new.codbarras, :new.ativo, :new.sinopse, :new.id_editora, :new.id_autor, null, null,
+        :new.id_dimensoes,:new.id_dimensoes, :new.id_dimensoes, :new.id_dimensoes, :new.id_grupoprecificacao, :new.justificativa, :new.id_catativinativacao);
+    ELSIF updating then
+      insert into livro_log(id_livro, data, hora, usuario, acao, old_titulo, old_ano, old_edicao, old_numPaginas, old_codBarras, old_status,
+        old_sinopse, old_editora, old_autor, old_categorias, old_subcategorias, old_altura, old_largura, old_peso, old_profundidade,
+        old_grupoprec, old_justificativa, old_catativinativacao, new_titulo, new_ano, new_edicao, new_numPaginas,
+        new_codBarras, new_status,new_sinopse,new_editora, new_autor, new_categorias, new_subcategorias,
+        new_altura,  new_largura, new_peso, new_profundidade, new_grupoprec, new_justificativa, new_catativinativacao) 
+      values(:new.id, sysdate, to_char(sysdate,'HH24:MI:SS'), 'Marcio', 'UPDATE', :old.titulo, :old.ano, :old.edicao, :old.numpaginas, :old.codbarras, :old.ativo, 
+        :old.sinopse, :old.id_editora, :old.id_autor, null, null, :old.id_dimensoes,:old.id_dimensoes, :old.id_dimensoes, :old.id_dimensoes, 
+        :old.id_grupoprecificacao, :old.justificativa, :old.id_catativinativacao, :new.titulo, :new.ano, :new.edicao, :new.numpaginas,
+        :new.codbarras, :new.ativo, :new.sinopse, :new.id_editora, :new.id_autor, null, null,
+        :new.id_dimensoes,:new.id_dimensoes, :new.id_dimensoes, :new.id_dimensoes, :new.id_grupoprecificacao, :new.justificativa, :new.id_catativinativacao);
+    else
+      insert into livro_log(id_livro, data, hora, usuario, acao, old_titulo, old_ano, old_edicao, old_numPaginas, old_codBarras, old_status,
+        old_sinopse, old_editora, old_autor, old_categorias, old_subcategorias, old_altura, old_largura, old_peso, old_profundidade,
+        old_grupoprec, old_justificativa, old_catativinativacao) 
+    values(:old.id, sysdate, to_char(sysdate,'HH24:MI:SS'), 'Marcio', 'DELETE', :old.titulo, :old.ano, :old.edicao, :old.numpaginas, :old.codbarras, :old.ativo, 
+        :old.sinopse, :old.id_editora, :old.id_autor, null, null, :old.id_dimensoes,:old.id_dimensoes, :old.id_dimensoes, :old.id_dimensoes, 
+        :old.id_grupoprecificacao, :old.justificativa, :old.id_catativinativacao);
+    end if;
+  end;
+/

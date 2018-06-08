@@ -1,0 +1,296 @@
+CREATE TABLE CupomPromocional
+  (
+    id              NUMBER (10) NOT NULL ,
+    dtcadastro      DATE ,
+    ativo           CHAR (1) ,
+    codigo          VARCHAR2 (10) ,
+    porcentagemDesc NUMBER 
+  ) ;
+ALTER TABLE CupomPromocional ADD CONSTRAINT CupomPromocional_PK PRIMARY KEY ( id ) ;
+
+create sequence id_CupomPromocional;
+
+create trigger trg_id_CupomPromocional
+  before insert on CupomPromocional
+  for each row
+  begin
+  select id_CupomPromocional.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_CupomPromocional
+
+BEFORE INSERT
+
+ON CupomPromocional
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE CupomTroca
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtcadastro DATE ,
+    ativo      CHAR (1) ,
+    codigo     VARCHAR2 (10) ,
+    valor      NUMBER ,
+    id_cliente NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE CupomTroca ADD CONSTRAINT CupomTroca_PK PRIMARY KEY ( id ) ;
+ALTER TABLE CupomTroca ADD CONSTRAINT CupomTroca_Cliente_FK FOREIGN KEY ( id_cliente ) REFERENCES Cliente ( id ) ;
+
+create sequence id_CupomTroca;
+
+create trigger trg_id_CupomTroca
+  before insert on CupomTroca
+  for each row
+  begin
+  select id_CupomTroca.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_CupomTroca
+
+BEFORE INSERT
+
+ON CupomTroca
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE Frete
+  (
+    id           NUMBER NOT NULL ,
+    dtcadastro   DATE ,
+    valor        NUMBER ,
+    prazoEntrega NUMBER ,
+    cepOrigem    VARCHAR2(9),
+    cepDestino VARCHAR2(9),
+    tipoEntrega VARCHAR2(10)
+  ) ;
+ALTER TABLE Frete ADD CONSTRAINT Frete_PK PRIMARY KEY ( id ) ;
+
+create sequence id_Frete;
+
+create trigger trg_id_Frete
+  before insert on Frete
+  for each row
+  begin
+  select id_Frete.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_Frete
+
+BEFORE INSERT
+
+ON Frete
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE Pedido
+  (
+    id                  NUMBER NOT NULL ,
+    dtcadastro          DATE ,
+    valorTotal          NUMBER ,
+    status              NUMBER ,
+    id_cliente          NUMBER (10) NOT NULL ,
+    id_cupomPromocional NUMBER (10),
+    id_frete            NUMBER (10) NOT NULL ,
+    id_endEntrega       NUMBER (10) NOT NULL,
+    valorTotalComDescontos NUMBER
+  ) ;
+ALTER TABLE Pedido ADD CONSTRAINT Pedido_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Pedido ADD CONSTRAINT Pedido_Cliente_FK FOREIGN KEY ( id_cliente ) REFERENCES Cliente ( id ) ;
+ALTER TABLE Pedido ADD CONSTRAINT Pedido_CupomPromocional_FK FOREIGN KEY ( id_cupomPromocional ) REFERENCES CupomPromocional ( id ) ;
+ALTER TABLE Pedido ADD CONSTRAINT Pedido_Endereco_FK FOREIGN KEY ( id_endEntrega ) REFERENCES Endereco ( id ) ;
+ALTER TABLE Pedido ADD CONSTRAINT Pedido_Frete_FK FOREIGN KEY ( id_frete ) REFERENCES Frete ( id ) ;
+
+create sequence id_Pedido;
+
+create trigger trg_id_Pedido
+  before insert on Pedido
+  for each row
+  begin
+  select id_Pedido.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_Pedido
+
+BEFORE INSERT
+
+ON Pedido
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE ItemPedido
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtcadastro DATE ,
+    qtde       NUMBER ,
+    valorUnitario NUMBER ,
+    status        NUMBER,
+    id_pedido  NUMBER (10) NOT NULL ,
+    id_estoque NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE ItemPedido ADD CONSTRAINT ItemPedido_PK PRIMARY KEY ( id ) ;
+ALTER TABLE ItemPedido ADD CONSTRAINT ItemPedido_Estoque_FK FOREIGN KEY ( id_estoque ) REFERENCES Estoque ( id ) ;
+ALTER TABLE ItemPedido ADD CONSTRAINT ItemPedido_Pedido_FK FOREIGN KEY ( id_pedido ) REFERENCES Pedido ( id ) ;
+
+create sequence id_ItemPedido;
+
+create trigger trg_id_ItemPedido
+  before insert on ItemPedido
+  for each row
+  begin
+  select id_ItemPedido.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_ItemPedido
+
+BEFORE INSERT
+
+ON ItemPedido
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE Pagamento
+  (
+    id            NUMBER (10) NOT NULL ,
+    dtcadastro    DATE ,
+    valor         NUMBER ,
+    status        NUMBER ,
+    id_cupomTroca NUMBER (10),
+    id_cartao     NUMBER (10),
+    id_pedido     NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Pagamento ADD CONSTRAINT Pagamento_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Pagamento ADD CONSTRAINT Pagamento_Cartao_FK FOREIGN KEY ( id_cartao ) REFERENCES Cartao ( id ) ;
+ALTER TABLE Pagamento ADD CONSTRAINT Pagamento_CupomTroca_FK FOREIGN KEY ( id_cupomTroca ) REFERENCES CupomTroca ( id ) ;
+ALTER TABLE Pagamento ADD CONSTRAINT Pagamento_Pedido_FK FOREIGN KEY ( id_pedido ) REFERENCES Pedido ( id ) ;
+
+create sequence id_Pagamento;
+
+create trigger trg_id_Pagamento
+  before insert on Pagamento
+  for each row
+  begin
+  select id_Pagamento.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_Pagamento
+
+BEFORE INSERT
+
+ON Pagamento
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE ItemBloqueioPedido
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtcadastro DATE ,
+    hora       DATE ,
+    qtde       NUMBER ,
+    id_estoque NUMBER (10) NOT NULL ,
+    id_pedido  NUMBER (10)
+  ) ;
+ALTER TABLE ItemBloqueioPedido ADD CONSTRAINT ItemBloqueioPedido_PK PRIMARY KEY ( id ) ;
+ALTER TABLE ItemBloqueioPedido ADD CONSTRAINT ItemBloqueioPedido_Estoque_FK FOREIGN KEY ( id_estoque ) REFERENCES Estoque ( id ) ;
+ALTER TABLE ItemBloqueioPedido ADD CONSTRAINT ItemBloqueioPedido_Pedido_FK FOREIGN KEY ( id_pedido ) REFERENCES Pedido ( id ) ;
+create sequence id_ItemBloqueioPedido;
+
+create trigger trg_id_ItemBloqueioPedido
+  before insert on ItemBloqueioPedido
+  for each row
+  begin
+  select id_ItemBloqueioPedido.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_ItemBloq
+
+BEFORE INSERT
+
+ON ItemBloqueioPedido
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+

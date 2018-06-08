@@ -1,0 +1,506 @@
+alter system set processes=150 scope=spfile;
+
+CREATE TABLE Pais
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (30)
+  ) ;
+ALTER TABLE Pais ADD CONSTRAINT Pais_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Estado
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (30) ,
+    id_pais    NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Estado ADD CONSTRAINT Estado_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Estado ADD CONSTRAINT Estado_Pais_FK FOREIGN KEY ( id_pais ) REFERENCES Pais ( id ) ;
+
+CREATE TABLE Cidade
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (30) ,
+    id_estado  NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Cidade ADD CONSTRAINT Cidade_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Cidade ADD CONSTRAINT Cidade_Estado_FK FOREIGN KEY ( id_estado ) REFERENCES Estado ( id ) ;
+
+CREATE TABLE TipoEndereco
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (20)
+  ) ;
+ALTER TABLE TipoEndereco ADD CONSTRAINT TipoEndereco_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Endereco
+  (
+    id              NUMBER (10) NOT NULL ,
+    dtCadastro      DATE ,
+    logradouro      VARCHAR2 (100) ,
+    numero          VARCHAR2 (10) ,
+    bairro          VARCHAR2 (50) ,
+    cep             VARCHAR2 (9) ,
+    observacoes     VARCHAR2 (400) ,
+    tipoResidencia  VARCHAR2 (30) ,
+    tipoLogradouro  VARCHAR2 (30) ,
+    titulo          VARCHAR2 (30) ,
+    id_cidade       NUMBER (10) NOT NULL ,
+    id_estado       NUMBER (10) NOT NULL ,
+    id_pais         NUMBER (10) NOT NULL ,
+    id_tipoEndereco NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Endereco ADD CONSTRAINT Endereco_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Endereco ADD CONSTRAINT Endereco_Cidade_FK FOREIGN KEY ( id_cidade ) REFERENCES Cidade ( id ) ;
+ALTER TABLE Endereco ADD CONSTRAINT Endereco_Cliente_FKv2 FOREIGN KEY ( id_estado ) REFERENCES Estado ( id ) ;
+ALTER TABLE Endereco ADD CONSTRAINT Endereco_Pais_FK FOREIGN KEY ( id_pais ) REFERENCES Pais ( id ) ;
+ALTER TABLE Endereco ADD CONSTRAINT Endereco_TipoEndereco_FK FOREIGN KEY ( id_tipoEndereco ) REFERENCES TipoEndereco ( id ) ;
+
+CREATE TABLE TipoTelefone
+  (
+    id         NUMBER NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (20)
+  ) ;
+ALTER TABLE TipoTelefone ADD CONSTRAINT TipoTelefone_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Telefone
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    ddd        NUMBER ,
+    numero     NUMBER ,
+    id_tipo    NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Telefone ADD CONSTRAINT Telefone_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Telefone ADD CONSTRAINT Telefone_Cliente_FKv1v1 FOREIGN KEY ( id_tipo ) REFERENCES TipoTelefone ( id ) ;
+
+CREATE TABLE Genero
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (20)
+  ) ;
+ALTER TABLE Genero ADD CONSTRAINT Genero_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Usuario
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    usuario    VARCHAR2 (40) ,
+    senha      VARCHAR2 (20)
+  ) ;
+ALTER TABLE Usuario ADD CONSTRAINT Usuario_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Cliente
+  (
+    id           NUMBER (10) NOT NULL ,
+    dtCadastro   DATE ,
+    nome         VARCHAR2 (50) ,
+    cpf          NUMBER ,
+    dtNascimento DATE ,
+    email        VARCHAR2 (40) ,
+    ativo        CHAR (1) ,
+    id_genero    NUMBER (10) NOT NULL ,
+    id_usuario   NUMBER (10) NOT NULL,
+    id_endPreferencial NUMBER (10),
+    id_cartaoPreferencial NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Cliente ADD CONSTRAINT Cliente_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Cliente ADD CONSTRAINT Cliente_Cartao_FK FOREIGN KEY ( id_cartaoPreferencial ) REFERENCES Cartao ( id ) ;
+ALTER TABLE Cliente ADD CONSTRAINT Cliente_Genero_FK FOREIGN KEY ( id_genero ) REFERENCES Genero ( id ) ;
+ALTER TABLE Cliente ADD CONSTRAINT Cliente_Usuario_FK FOREIGN KEY ( id_usuario ) REFERENCES Usuario ( id ) ;
+ALTER TABLE Cliente ADD CONSTRAINT Cliente_Endereco_FK FOREIGN KEY ( id_endPreferencial ) REFERENCES Endereco ( id ) ;
+
+CREATE TABLE BandeiraCartao
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    bin        NUMBER (6) ,
+    nome       VARCHAR2 (20)
+  ) ;
+ALTER TABLE BandeiraCartao ADD CONSTRAINT BandeiraCartao_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Cartao
+  (
+    id           NUMBER (10) NOT NULL ,
+    dtCadastro   DATE ,
+    numero       NUMBER ,
+    nomeImpresso VARCHAR2 (30) ,
+    codSeguranca NUMBER ,
+    preferencial CHAR (1) ,
+    dtVencimento DATE ,
+    tipoCartao   NUMBER,
+    id_bandeira  NUMBER (10) NOT NULL ,
+    id_cliente   NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Cartao ADD CONSTRAINT Cartao_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Cartao ADD CONSTRAINT Cartao_BandeiraCartao_FK FOREIGN KEY ( id_bandeira ) REFERENCES BandeiraCartao ( id ) ;
+ALTER TABLE Cartao ADD CONSTRAINT Cartao_Cliente_FK FOREIGN KEY ( id_cliente ) REFERENCES Cliente ( id ) ;
+
+CREATE TABLE Cliente_end
+  (
+    id_cliente  NUMBER (10) NOT NULL ,
+    id_endereco NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Cliente_end ADD CONSTRAINT Cliente_end_Cliente_FK FOREIGN KEY ( id_cliente ) REFERENCES Cliente ( id ) ;
+ALTER TABLE Cliente_end ADD CONSTRAINT Cliente_end_Endereco_FK FOREIGN KEY ( id_endereco ) REFERENCES Endereco ( id ) ;
+
+CREATE TABLE Cliente_tel
+  (
+    id_cliente  NUMBER (10) NOT NULL ,
+    id_telefone NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Cliente_tel ADD CONSTRAINT TABLE_30_Cliente_FK FOREIGN KEY ( id_cliente ) REFERENCES Cliente ( id ) ;
+ALTER TABLE Cliente_tel ADD CONSTRAINT TABLE_30_Telefone_FK FOREIGN KEY ( id_telefone ) REFERENCES Telefone ( id ) ;
+
+create sequence id_pais;
+
+create trigger trg_id_pais
+  before insert on pais
+  for each row
+  begin
+  select id_pais.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_pais
+
+BEFORE INSERT
+
+ON pais
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_estado;
+
+create trigger trg_id_estado
+  before insert on estado
+  for each row
+  begin
+  select id_estado.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_estado
+
+BEFORE INSERT
+
+ON estado
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_cidade;
+
+create trigger trg_id_cidade
+  before insert on cidade
+  for each row
+  begin
+  select id_cidade.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_cidade
+
+BEFORE INSERT
+
+ON cidade
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_endereco;
+
+create trigger trg_id_endereco
+  before insert on endereco
+  for each row
+  begin
+  select id_endereco.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_endereco
+
+BEFORE INSERT
+
+ON endereco
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_TipoEndereco;
+
+create trigger trg_id_TipoEndereco
+  before insert on TipoEndereco
+  for each row
+  begin
+  select id_TipoEndereco.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_TipoEndereco
+
+BEFORE INSERT
+
+ON TipoEndereco
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_TipoTelefone;
+
+create trigger trg_id_TipoTelefone
+  before insert on TipoTelefone
+  for each row
+  begin
+  select id_TipoTelefone.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_TipoTelefone
+
+BEFORE INSERT
+
+ON TipoTelefone
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_telefone;
+
+create trigger trg_id_telefone
+  before insert on telefone
+  for each row
+  begin
+  select id_telefone.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_telefone
+
+BEFORE INSERT
+
+ON telefone
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_genero;
+
+create trigger trg_id_genero
+  before insert on genero
+  for each row
+  begin
+  select id_genero.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_genero
+
+BEFORE INSERT
+
+ON genero
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_cliente;
+
+create trigger trg_id_cliente
+  before insert on cliente
+  for each row
+  begin
+  select id_cliente.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_cliente
+
+BEFORE INSERT
+
+ON cliente
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_cartao;
+
+create trigger trg_id_cartao
+  before insert on cartao
+  for each row
+  begin
+  select id_cartao.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_cartao
+
+BEFORE INSERT
+
+ON cartao
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_BandeiraCartao;
+
+create trigger trg_id_BandeiraCartao
+  before insert on BandeiraCartao
+  for each row
+  begin
+  select id_BandeiraCartao.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_BandeiraCartao
+
+BEFORE INSERT
+
+ON BandeiraCartao
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_usuario;
+
+create trigger trg_id_usuario
+  before insert on usuario
+  for each row
+  begin
+  select id_usuario.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_usuario
+
+BEFORE INSERT
+
+ON usuario
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/

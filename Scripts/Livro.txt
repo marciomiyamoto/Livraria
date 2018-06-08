@@ -1,0 +1,377 @@
+CREATE TABLE Autor
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    nome       VARCHAR2 (50)
+  ) ;
+ALTER TABLE Autor ADD CONSTRAINT Autor_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Categoria
+  (
+    id              NUMBER (10) NOT NULL ,
+    dtCadastro      DATE ,
+    nome            VARCHAR2 (30) ,
+    tipo            VARCHAR2 (20)     
+  ) ;
+ALTER TABLE Categoria ADD CONSTRAINT Categoria_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Subcategoria
+  (
+    id           NUMBER (10) NOT NULL ,
+    dtCadastro   DATE ,
+    nome         VARCHAR2 (30)
+  ) ;
+ALTER TABLE Subcategoria ADD CONSTRAINT Subcategoria_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Editora
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE NOT NULL ,
+    nome       VARCHAR2 (30)
+  ) ;
+ALTER TABLE Editora ADD CONSTRAINT Editora_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Dimensoes
+  (
+    id           NUMBER (10) NOT NULL ,
+    dtCadastro   DATE ,
+    altura       NUMBER ,
+    largura      NUMBER ,
+    peso         NUMBER ,
+    profundidade NUMBER
+  ) ;
+ALTER TABLE Dimensoes ADD CONSTRAINT Dimensoes_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE GrupoDePrecificacao
+  (
+    id            NUMBER (10) NOT NULL ,
+    dtCadastro    DATE ,
+    nome          VARCHAR2 (30) ,
+    margemDeLucro NUMBER
+  ) ;
+ALTER TABLE GrupoDePrecificacao ADD CONSTRAINT GrupoDePrecificacao_PK PRIMARY KEY ( id ) ;
+
+CREATE TABLE Livro
+  (
+    id                   NUMBER (10) NOT NULL ,
+    dtCadastro           DATE ,
+    titulo               VARCHAR2 (50) ,
+    ano                  NUMBER ,
+    edicao               NUMBER ,
+    numPaginas           NUMBER ,
+    codBarras            VARCHAR2 (30) ,
+    ativo                CHAR (1) ,
+    sinopse              VARCHAR2 (400) ,    
+    id_editora           NUMBER (10) NOT NULL ,
+    id_autor             NUMBER (10) NOT NULL ,    
+    id_grupoPrecificacao NUMBER (10) NOT NULL ,
+    id_dimensoes         NUMBER (10) NOT NULL,
+    justificativa        VARCHAR2 (50) ,
+    id_catativinativacao NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Livro ADD CONSTRAINT Livro_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Livro ADD CONSTRAINT Livro_Autor_FK FOREIGN KEY ( id_autor ) REFERENCES Autor ( id ) ;
+ALTER TABLE Livro ADD CONSTRAINT Livro_Dimensoes_FK FOREIGN KEY ( id_dimensoes ) REFERENCES Dimensoes ( id ) ;
+ALTER TABLE Livro ADD CONSTRAINT Livro_Editora_FK FOREIGN KEY ( id_editora ) REFERENCES Editora ( id ) ;
+ALTER TABLE Livro ADD CONSTRAINT Livro_GrupoDePrecificacao_FK FOREIGN KEY ( id_grupoPrecificacao ) REFERENCES GrupoDePrecificacao ( id ) ;
+ALTER TABLE Livro ADD CONSTRAINT Livro_Categoria_FKv1 FOREIGN KEY ( id_catativinativacao ) REFERENCES Categoria ( id ) ;
+
+CREATE TABLE Estoque
+  (
+    id         NUMBER (10) NOT NULL ,
+    dtCadastro DATE ,
+    id_livro   NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Estoque ADD CONSTRAINT Estoque_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Estoque ADD CONSTRAINT Estoque_Livro_FK FOREIGN KEY ( id_livro ) REFERENCES Livro ( id ) ;
+
+
+create sequence id_autor;
+
+create trigger trg_id_autor
+  before insert on autor
+  for each row
+  begin
+  select id_autor.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_autor
+
+BEFORE INSERT
+
+ON autor
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_subcategoria;
+
+create trigger trg_id_subcategoria
+  before insert on subcategoria
+  for each row
+  begin
+  select id_subcategoria.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_subcategoria
+
+BEFORE INSERT
+
+ON subcategoria
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_categoria;
+
+create trigger trg_id_categoria
+  before insert on categoria
+  for each row
+  begin
+  select id_categoria.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_categoria
+
+BEFORE INSERT
+
+ON categoria
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_editora;
+
+create trigger trg_id_editora
+  before insert on editora
+  for each row
+  begin
+  select id_editora.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_editora
+
+BEFORE INSERT
+
+ON editora
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_dimensoes;
+
+create trigger trg_id_dimensoes
+  before insert on dimensoes
+  for each row
+  begin
+  select id_dimensoes.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_dimensoes
+
+BEFORE INSERT
+
+ON dimensoes
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_grupodeprecificacao;
+
+create trigger trg_id_grupodeprecificacao
+  before insert on grupodeprecificacao
+  for each row
+  begin
+  select id_grupodeprecificacao.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_grupodeprec
+
+BEFORE INSERT
+
+ON grupodeprecificacao
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_livro;
+
+create trigger trg_id_livro
+  before insert on livro
+  for each row
+  begin
+  select id_livro.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_livro
+
+BEFORE INSERT
+
+ON livro
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+create sequence id_estoque;
+
+create trigger trg_id_estoque
+  before insert on estoque
+  for each row
+  begin
+  select id_estoque.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_estoque
+
+BEFORE INSERT
+
+ON estoque
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
+
+CREATE TABLE Livro_categoria
+  (
+    id_livro        NUMBER (10) NOT NULL ,
+    id_categoria    NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Livro_categoria ADD CONSTRAINT Livro_categoria_Categoria_FK FOREIGN KEY ( id_categoria ) REFERENCES Categoria ( id ) ;
+ALTER TABLE Livro_categoria ADD CONSTRAINT Livro_categoria_Livro_FK FOREIGN KEY ( id_livro ) REFERENCES Livro ( id ) ;
+
+CREATE TABLE Livro_subcategoria
+  (
+    id_livro        NUMBER (10) NOT NULL ,
+    id_subcategoria NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Livro_subcategoria ADD CONSTRAINT Livro_subcat_Subcat_FK FOREIGN KEY ( id_subcategoria ) REFERENCES Subcategoria ( id ) ;
+ALTER TABLE Livro_subcategoria ADD CONSTRAINT Livro_subcategoria_Livro_FK FOREIGN KEY ( id_livro ) REFERENCES Livro ( id ) ;
+
+CREATE TABLE Registro
+  (
+    id           NUMBER (10) NOT NULL ,
+    dtcadastro   DATE ,
+    qtde         NUMBER ,
+    valorCompra  NUMBER ,
+    valorVenda   NUMBER ,
+    tipoRegistro NUMBER ,
+    id_estoque   NUMBER (10) NOT NULL
+  ) ;
+ALTER TABLE Registro ADD CONSTRAINT Registro_PK PRIMARY KEY ( id ) ;
+ALTER TABLE Registro ADD CONSTRAINT Registro_Estoque_FK FOREIGN KEY ( id_estoque ) REFERENCES Estoque ( id ) ;
+
+create sequence id_registro;
+
+create trigger trg_id_registro
+  before insert on registro
+  for each row
+  begin
+  select id_registro.nextval
+  into :new.id
+  from dual;
+  end;
+  /
+
+CREATE OR REPLACE TRIGGER date_trigger_registro
+
+BEFORE INSERT
+
+ON registro
+
+REFERENCING NEW AS NEW
+
+FOR EACH ROW
+
+BEGIN
+
+SELECT sysdate INTO :NEW.DTCADASTRO FROM dual;
+
+END;
+/
